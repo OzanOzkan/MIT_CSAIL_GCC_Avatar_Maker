@@ -28,7 +28,7 @@ public class UIAssetCategoryButtonController : MonoBehaviour
         Transform scrollView = GameObject.Find("Canvas").transform.Find("scrollview").transform.Find("Viewport").transform.Find("Content");
         scrollView.DestroyChildren();
 
-        foreach (CBaseAsset asset in AvatarCreatorContext.m_assets[m_assetType])
+        foreach (CBaseAsset asset in AvatarCreatorContext.GetLoadedAssetsByType(m_assetType))
         {
             GameObject btn = Instantiate(Resources.Load<GameObject>("Button"));
             btn.AddComponent<UIScrollViewButtonController>().faceAsset = asset;

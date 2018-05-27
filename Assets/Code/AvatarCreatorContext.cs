@@ -43,6 +43,8 @@ public class AvatarCreatorContext : MonoBehaviour {
         CBaseAssetFactory assetFactory = new CBaseAssetFactory();
         List<CBaseAsset> assets = new List<CBaseAsset>();
 
+        // TODO: WONT WORK IN RUNTIME. CHANGE IT TO RESOURCES.LOAD() !
+
         DirectoryInfo dir = new DirectoryInfo(directoryPath);
         FileInfo[] info = dir.GetFiles(filepattern);
 
