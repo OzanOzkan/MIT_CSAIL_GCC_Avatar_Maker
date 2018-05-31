@@ -1,33 +1,43 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEditor;
 using System.IO;
+using UnityEngine.UI;
 
 public class AvatarCreatorContext : MonoBehaviour {
 
     public static AssetType selectedAssetType { get; set; }
     public static Dictionary<AssetType, List<CBaseAsset>> m_assets = new Dictionary<AssetType, List<CBaseAsset>>();
     public static FaceObjectController faceObject;
+    public static LogManager logManager;
+    public static bool takeScreenShot = false;
+    public static GUID sessionguid;
 
     // Use this for initialization
     void Start () {
         DontDestroyOnLoad(this.gameObject);
 
+        sessionguid = GUID.Generate();
+        GameObject.Find("txt_guid").GetComponent<Text>().text = sessionguid.ToString();
+
+        logManager = gameObject.GetComponent<LogManager>();
+
         faceObject = GameObject.Find("FaceObject").GetComponent<FaceObjectController>();
         selectedAssetType = AssetType.None;
         
         // No genders are TODO. Depends to the provided content.
-        InitAssets("Assets/Resources/FaceObject/fo_faceshape/", AssetType.HeadShape, AssetGender.NoGender);
-        InitAssets("Assets/Resources/FaceObject/fo_hair/male/", AssetType.Hair, AssetGender.Male);
-        InitAssets("Assets/Resources/FaceObject/fo_hair/female/", AssetType.Hair, AssetGender.Female);
-        InitAssets("Assets/Resources/FaceObject/fo_ears/", AssetType.Ears, AssetGender.NoGender);
-        InitAssets("Assets/Resources/FaceObject/fo_eyes/", AssetType.Eyes, AssetGender.NoGender);
-        InitAssets("Assets/Resources/FaceObject/fo_eyebrows/", AssetType.Eyebrows, AssetGender.NoGender);
-        InitAssets("Assets/Resources/FaceObject/fo_glasses/", AssetType.Glasses, AssetGender.NoGender);
-        InitAssets("Assets/Resources/FaceObject/fo_facedetail/", AssetType.FaceTexture, AssetGender.NoGender);
-        InitAssets("Assets/Resources/FaceObject/fo_nose/", AssetType.Nose, AssetGender.NoGender);
-        InitAssets("Assets/Resources/FaceObject/fo_moustache/", AssetType.Moustache, AssetGender.Male);
-        InitAssets("Assets/Resources/FaceObject/fo_beard/", AssetType.Beard, AssetGender.Male);
+        InitAssets("FaceObject/fo_faceshape/", AssetType.HeadShape, AssetGender.NoGender);
+        InitAssets("FaceObject/fo_hair/male/", AssetType.Hair, AssetGender.Male);
+        InitAssets("FaceObject/fo_hair/female/", AssetType.Hair, AssetGender.Female);
+        InitAssets("FaceObject/fo_ears/", AssetType.Ears, AssetGender.NoGender);
+        InitAssets("FaceObject/fo_eyes/", AssetType.Eyes, AssetGender.NoGender);
+        InitAssets("FaceObject/fo_eyebrows/", AssetType.Eyebrows, AssetGender.NoGender);
+        InitAssets("FaceObject/fo_glasses/", AssetType.Glasses, AssetGender.NoGender);
+        InitAssets("FaceObject/fo_facedetail/", AssetType.FaceTexture, AssetGender.NoGender);
+        InitAssets("FaceObject/fo_nose/", AssetType.Nose, AssetGender.NoGender);
+        InitAssets("FaceObject/fo_moustache/", AssetType.Moustache, AssetGender.Male);
+        InitAssets("FaceObject/fo_beard/", AssetType.Beard, AssetGender.Male);
         //InitAssets("Assets/Resources/FaceObject/fo_mouth/male/", AssetType.Mouth, AssetGender.Male);          TODO
         //InitAssets("Assets/Resources/FaceObject/fo_mouth/female/", AssetType.Mouth, AssetGender.Female);      TODO
     }
@@ -36,21 +46,17 @@ public class AvatarCreatorContext : MonoBehaviour {
     {
         Debug.Log("AvatarCreatorContext:InitAssets: " + directoryPath + " " + assetType + " " + assetGender);
 
-        string filepattern = "*.png";
-        if (assetType == AssetType.Hair)
-            filepattern = "*a.png";
-
         CBaseAssetFactory assetFactory = new CBaseAssetFactory();
         List<CBaseAsset> assets = new List<CBaseAsset>();
 
-        // TODO: WONT WORK IN RUNTIME. CHANGE IT TO RESOURCES.LOAD() !
-
-        DirectoryInfo dir = new DirectoryInfo(directoryPath);
-        FileInfo[] info = dir.GetFiles(filepattern);
-
-        foreach (FileInfo finfo in info)
+        Object[] sprites = Resources.LoadAll(directoryPath, typeof(Sprite));
+        foreach(Sprite sprite in sprites)
         {
-            assets.Add(assetFactory.CreateAsset(assetType, assetGender, directoryPath.Replace("Assets/Resources/", "") + finfo.Name));
+            string spritename = sprite.name + ".png";
+            if (spritename.Contains("b.png")) // TODO: This check is not good... Figure out later.
+                continue;
+
+            assets.Add(assetFactory.CreateAsset(assetType, assetGender, directoryPath + spritename));
         }
 
         if(m_assets.ContainsKey(assetType))

@@ -43,5 +43,6 @@ public class UIModificationButtonController : MonoBehaviour {
                 || m_buttonType == AssetModifyFlag.StretchVertical || m_buttonType == AssetModifyFlag.StretchHorizontal)
             AvatarCreatorContext.faceObject.ResizeAsset(m_buttonType, positiveRate);
 
+        AvatarCreatorContext.logManager.LogAction("FaceAssetModified", m_buttonType.ToString() + positiveRate.ToString());
     }
 }

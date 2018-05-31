@@ -24,6 +24,8 @@ public class UIAssetCategoryButtonController : MonoBehaviour
         AvatarCreatorContext.selectedAssetType = m_assetType;
         Debug.Log("Asset type changed to: " + m_assetType.ToString());
 
+        AvatarCreatorContext.logManager.LogAction("AssetTypeChanged", m_assetType.ToString());
+
         // Todo: Maybe into the AvatarCreatorContext?
         Transform scrollView = GameObject.Find("Canvas").transform.Find("scrollview").transform.Find("Viewport").transform.Find("Content");
         scrollView.DestroyChildren();
