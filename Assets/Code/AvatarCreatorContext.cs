@@ -4,6 +4,8 @@ using UnityEngine;
 using UnityEditor;
 using System.IO;
 using UnityEngine.UI;
+using System.Xml;
+using System.Text;
 
 public class AvatarCreatorContext : MonoBehaviour {
 
@@ -11,17 +13,19 @@ public class AvatarCreatorContext : MonoBehaviour {
     public static Dictionary<AssetType, List<CBaseAsset>> m_assets = new Dictionary<AssetType, List<CBaseAsset>>();
     public static FaceObjectController faceObject;
     public static LogManager logManager;
+    public static FileTransferManager fileTransferManager;
     public static bool takeScreenShot = false;
-    public static GUID sessionguid;
+    public static System.Guid sessionguid;
 
     // Use this for initialization
     void Start () {
         DontDestroyOnLoad(this.gameObject);
 
-        sessionguid = GUID.Generate();
+        sessionguid = System.Guid.NewGuid();
         GameObject.Find("txt_guid").GetComponent<Text>().text = sessionguid.ToString();
 
         logManager = gameObject.GetComponent<LogManager>();
+        fileTransferManager = gameObject.GetComponent<FileTransferManager>();
 
         faceObject = GameObject.Find("FaceObject").GetComponent<FaceObjectController>();
         selectedAssetType = AssetType.None;
@@ -78,13 +82,55 @@ public class AvatarCreatorContext : MonoBehaviour {
     public static List<CBaseAsset> GetLoadedAssetsByTypeAndGender(AssetType type, AssetGender gender)
     {
         List<CBaseAsset> returnList = new List<CBaseAsset>();
-        
-        foreach(CBaseAsset asset in m_assets[type])
+
+        foreach (CBaseAsset asset in m_assets[type])
         {
             if (asset.GetGender() == gender)
                 returnList.Add(asset);
         }
 
         return returnList;
+    }
+
+    public static CBaseAsset FindAssetByName(string name)
+    {
+        foreach(List<CBaseAsset> currentAssetlist in m_assets.Values)
+        {
+            foreach (CBaseAsset currentAsset in currentAssetlist)
+            {
+                foreach (KeyValuePair<SpritePart, Sprite> sprite in currentAsset.GetSprites())
+                {
+                    if (sprite.Value.name == name)
+                        return currentAsset;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    public static CBaseAsset FindAssetByName(AssetType type, string name)
+    {
+        foreach (CBaseAsset currentAsset in m_assets[type])
+        {
+            foreach (KeyValuePair<SpritePart, Sprite> sprite in currentAsset.GetSprites())
+            {
+                if (sprite.Value.name == name)
+                    return currentAsset;
+            }
+        }
+
+        return null;
+    }
+
+    public static void SaveAvatarToFile()
+    {
+        Debug.Log(faceObject.Serialize());
+    }
+
+    // FileTransferManager calls this method.
+    public static void LoadAvatarFromFile(string data)
+    {
+        faceObject.Unserialize(data);
     }
 }

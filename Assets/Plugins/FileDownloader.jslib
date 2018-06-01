@@ -1,5 +1,5 @@
 var FileDownloaderPlugin = {
-  ImageDownloader: function(str, fn, ctype) {
+  FileDownloader: function(str, fn, ctype) {
       var msg = Pointer_stringify(str);
       var fname = Pointer_stringify(fn);
       var contentType = ctype;

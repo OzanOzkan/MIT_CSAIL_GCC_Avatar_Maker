@@ -57,13 +57,13 @@ public enum SpritePart
 }
 #endregion
 
-public abstract class CBaseAsset
+public class CBaseAsset
 {
     #region Member Values
     protected AssetGender m_assetGender;
     protected AssetType m_assetType;
     protected AssetModifyFlag m_modifyFlags;
-    protected Dictionary<SpritePart, Sprite> m_sprites;
+    protected Dictionary<SpritePart, Sprite> m_sprites;  // TODO: protected Dictionary<RealismLevel, Dictionary<SpritePart, Sprite>> m_sprites;
     #endregion
 
     public CBaseAsset(AssetGender gender, AssetType assetType, AssetModifyFlag modifyFlags, string assetPath, bool loadSpriteOverride=false)
@@ -84,8 +84,20 @@ public abstract class CBaseAsset
 
         if (!isOverride)
         {
-            m_sprites.Add(SpritePart.Default, Resources.Load<Sprite>(GetResourcePath(assetPath)));
-            Debug.Log("CBaseAsset:LoadSprite: " + GetResourcePath(assetPath));
+            if (assetPath.Length > 0)
+            {
+                m_sprites.Add(SpritePart.Default, Resources.Load<Sprite>(GetResourcePath(assetPath)));
+                Debug.Log("CBaseAsset:LoadSprite: " + GetResourcePath(assetPath));
+
+                return;
+            }
+
+            // For the dummy CBaseAsset creation.
+            m_sprites.Add(SpritePart.Default, null);
+            m_sprites.Add(SpritePart.Front, null);
+            m_sprites.Add(SpritePart.Back, null);
+            m_sprites.Add(SpritePart.Left, null);
+            m_sprites.Add(SpritePart.Right, null);
         }
         else
         {

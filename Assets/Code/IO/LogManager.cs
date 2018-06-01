@@ -24,20 +24,26 @@ public class LogManager : MonoBehaviour
         m_actionLogs.Append(rowdata);
     }
 
-    public void DumpLogs()
+    public string DumpLogs()
     {
-        m_actionLogs.Append("</Actions>");
+        Debug.Log("LogManager:DumpLogs(): Dumping logs to server.");
 
-        StartCoroutine(PHPRequest(m_actionLogs));
+        m_actionLogs.Append("</Actions>\n");
+
+        string data = "<SaveFile>\n" + AvatarCreatorContext.faceObject.Serialize() + "\n" + m_actionLogs.ToString() + "</SaveFile>";
+
+        StartCoroutine(PHPRequest(data));
+
+        return data;
     }
 
-    IEnumerator PHPRequest(StringBuilder data)
+    IEnumerator PHPRequest(string data)
     {
         bool successfull = true;
 
         WWWForm form = new WWWForm();
         form.AddField("filename", AvatarCreatorContext.sessionguid.ToString());
-        form.AddField("data", data.ToString());
+        form.AddField("data", data);
         WWW www = new WWW("http://localhost:8080/savetelemetry.php", form);
 
         yield return www;

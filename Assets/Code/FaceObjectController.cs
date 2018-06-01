@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
+using System.Xml;
+using System.Text;
 
 public class FaceObjectController : MonoBehaviour
 {
@@ -24,34 +26,45 @@ public class FaceObjectController : MonoBehaviour
         //m_transforms.Add(AssetType.Mouth, gameObject.transform.Find("fo_mouth"));
         // TODO: Body depends to provided assets.
 
+        GenerateRandomAvatar();
+    }
+
+    public void GenerateRandomAvatar()
+    {
         // Random face generation. TODO: Gender corrections.
         AssetGender randomGender = (AssetGender)Random.Range(0, 1);
 
         List<CBaseAsset> tempAssets = AvatarCreatorContext.GetLoadedAssetsByType(AssetType.HeadShape);
-        SetFaceObjectPart(tempAssets[Random.Range(0, tempAssets.Count - 1)]);
+        SetFaceObjectPart(tempAssets[Random.Range(0, tempAssets.Count - 1)], false);
 
         tempAssets = AvatarCreatorContext.GetLoadedAssetsByType(AssetType.Ears);
-        SetFaceObjectPart(tempAssets[Random.Range(0, tempAssets.Count - 1)]);
+        SetFaceObjectPart(tempAssets[Random.Range(0, tempAssets.Count - 1)], false);
 
         tempAssets = AvatarCreatorContext.GetLoadedAssetsByTypeAndGender(AssetType.Hair, randomGender);
-        SetFaceObjectPart(tempAssets[Random.Range(0, tempAssets.Count - 1)]);
+        SetFaceObjectPart(tempAssets[Random.Range(0, tempAssets.Count - 1)], false);
 
         tempAssets = AvatarCreatorContext.GetLoadedAssetsByType(AssetType.Eyes);
-        SetFaceObjectPart(tempAssets[Random.Range(0, tempAssets.Count - 1)]);
+        SetFaceObjectPart(tempAssets[Random.Range(0, tempAssets.Count - 1)], false);
 
         tempAssets = AvatarCreatorContext.GetLoadedAssetsByType(AssetType.Eyebrows);
-        SetFaceObjectPart(tempAssets[Random.Range(0, tempAssets.Count - 1)]);
+        SetFaceObjectPart(tempAssets[Random.Range(0, tempAssets.Count - 1)], false);
 
         tempAssets = AvatarCreatorContext.GetLoadedAssetsByType(AssetType.Nose);
-        SetFaceObjectPart(tempAssets[Random.Range(0, tempAssets.Count - 1)]);
+        SetFaceObjectPart(tempAssets[Random.Range(0, tempAssets.Count - 1)], false);
     }
 
-    public void SetFaceObjectPart(CBaseAsset asset)
+    public void SetFaceObjectPart(CBaseAsset asset, bool isUserAction=true)
     {
+        if (asset == null)
+            return;
+
         Transform currentTransform = m_transforms[asset.GetAssetType()];
 
-        if (CheckPreviousAssetAndRemove(currentTransform, asset.GetSprites()[SpritePart.Default]))
-            return;
+        if (isUserAction)
+        {
+            if (CheckPreviousAssetAndRemove(currentTransform, asset.GetSprites()[SpritePart.Default]))
+                return;
+        }
 
         if (asset.GetAssetType() == AssetType.Hair)
         {
@@ -184,5 +197,78 @@ public class FaceObjectController : MonoBehaviour
         m_transforms[AssetType.Ears].transform.Find("fo_ear_right").GetComponent<SpriteRenderer>().color = color;
 
         m_transforms[AssetType.Nose].GetComponent<SpriteRenderer>().color = color;
+    }
+
+    public string Serialize()
+    {
+        Debug.Log("FaceObjectController:Serialize()");
+
+        StringBuilder content = new StringBuilder();
+        content.Append("<FaceObject>\n");
+
+        foreach (KeyValuePair<AssetType, Transform> fObject in m_transforms)
+        {
+            if (fObject.Value.childCount > 0)
+            {
+                for (int i = 0; i < fObject.Value.childCount; ++i)
+                {
+                    content.Append(PrepareSerializeLine(fObject.Key, fObject.Value.GetChild(i)));
+                }
+            }
+            else
+            {
+                content.Append(PrepareSerializeLine(fObject.Key, fObject.Value));
+            }
+        }
+
+        content.Append("</FaceObject>");
+
+        return content.ToString();
+    }
+
+    private string PrepareSerializeLine(AssetType type, Transform transform)
+    {
+        string returnStr = "<Object ";
+        returnStr += "name=\"" + transform.name + "\" ";
+
+        if (transform.GetComponent<SpriteRenderer>().sprite != null)
+            returnStr += "asset=\"" + transform.GetComponent<SpriteRenderer>().sprite.name + "\" ";
+        else
+            returnStr += "asset=\"\" ";
+
+        returnStr += "type=\"" + type + "\" ";
+        returnStr += "/>\n";
+
+        return returnStr;
+    }
+
+    public void Unserialize(string data)
+    {
+        Debug.Log("FaceObjectController:Unserialize()\n" + data);
+
+        AssetType assetType = AssetType.None;
+        string assetName = "";
+
+        XmlDocument doc = new XmlDocument();
+        doc.LoadXml(data);
+
+        XmlNode root = doc.DocumentElement.SelectSingleNode("/SaveFile/FaceObject");
+        foreach (XmlNode node in root.ChildNodes)
+        {
+            foreach (XmlAttribute attr in node.Attributes)
+            {
+                if (attr.Name == "asset")
+                    assetName = attr.Value;
+                else if (attr.Name == "type")
+                    assetType = (AssetType)System.Enum.Parse(typeof(AssetType), attr.Value);
+            }
+
+            CBaseAsset asset = AvatarCreatorContext.FindAssetByName(assetType, assetName);
+
+            if (asset == null)
+                asset = new CBaseAsset(AssetGender.NoGender, assetType, 0, "");
+
+            SetFaceObjectPart(asset, false);
+        }
     }
 }
