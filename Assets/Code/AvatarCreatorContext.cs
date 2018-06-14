@@ -44,6 +44,8 @@ public class AvatarCreatorContext : MonoBehaviour {
         InitAssets("FaceObject/fo_beard/", AssetType.Beard, AssetGender.Male);
         //InitAssets("Assets/Resources/FaceObject/fo_mouth/male/", AssetType.Mouth, AssetGender.Male);          TODO
         //InitAssets("Assets/Resources/FaceObject/fo_mouth/female/", AssetType.Mouth, AssetGender.Female);      TODO
+
+        //faceObject.GenerateRandomAvatar();
     }
 
     private void InitAssets(string directoryPath, AssetType assetType, AssetGender assetGender)

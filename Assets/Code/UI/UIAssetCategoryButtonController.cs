@@ -32,8 +32,8 @@ public class UIAssetCategoryButtonController : MonoBehaviour
 
         foreach (CBaseAsset asset in AvatarCreatorContext.GetLoadedAssetsByType(m_assetType))
         {
-            GameObject btn = Instantiate(Resources.Load<GameObject>("Button"));
-            btn.AddComponent<UIScrollViewButtonController>().faceAsset = asset;
+            GameObject btn = Instantiate(Resources.Load<GameObject>("asset_selection_button"));
+            btn.GetComponent<UIScrollViewButtonController>().faceAsset = asset;
             btn.transform.SetParent(scrollView, false);
         }
     }

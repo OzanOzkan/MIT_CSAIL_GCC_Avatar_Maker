@@ -9,8 +9,12 @@ public class UIScrollViewButtonController : MonoBehaviour
 
     private void Start()
     {
-        gameObject.GetComponent<Image>().sprite = faceAsset.GetSprites()[SpritePart.Default];
+        //gameObject.GetComponent<Image>().sprite = faceAsset.GetSprites()[SpritePart.Default];
         gameObject.GetComponent<Button>().onClick.AddListener(() => OnButtonClick());
+        GameObject btnFaceObject = Instantiate(AvatarCreatorContext.faceObject.gameObject, gameObject.transform);
+        btnFaceObject.transform.localScale = new Vector3(6, 6, 6);
+        //btnFaceObject.transform.position = new Vector3(btnFaceObject.transform.position.x, -5f, btnFaceObject.transform.position.z);
+        btnFaceObject.GetComponent<FaceObjectController>().SetFaceObjectPart(faceAsset, false);
     }
 
     public void OnButtonClick()

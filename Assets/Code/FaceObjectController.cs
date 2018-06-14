@@ -10,7 +10,7 @@ public class FaceObjectController : MonoBehaviour
 {
     public Dictionary<AssetType, Transform> m_transforms;
 
-    private void Start()
+    private void Awake()
     {
         // GameObject mappings.
         m_transforms = new Dictionary<AssetType, Transform>();
@@ -26,8 +26,6 @@ public class FaceObjectController : MonoBehaviour
         m_transforms.Add(AssetType.Beard, gameObject.transform.Find("fo_beard"));
         //m_transforms.Add(AssetType.Mouth, gameObject.transform.Find("fo_mouth"));
         // TODO: Body depends to provided assets.
-
-        GenerateRandomAvatar();
     }
 
     public void GenerateRandomAvatar()
