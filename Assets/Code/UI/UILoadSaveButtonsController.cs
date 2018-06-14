@@ -37,5 +37,7 @@ public class UILoadSaveButtonsController : MonoBehaviour {
             string savedata = AvatarCreatorContext.logManager.DumpLogs();
             AvatarCreatorContext.fileTransferManager.DownloadSaveFile(savedata);
         }
+
+        AvatarCreatorContext.logManager.LogAction("UIButtonClick", m_buttonType.ToString());
     }
 }

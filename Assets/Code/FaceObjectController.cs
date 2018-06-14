@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEditor;
 using System.Xml;
 using System.Text;
+using UnityEngine.UI;
 
 public class FaceObjectController : MonoBehaviour
 {
@@ -32,25 +33,25 @@ public class FaceObjectController : MonoBehaviour
     public void GenerateRandomAvatar()
     {
         // Random face generation. TODO: Gender corrections.
-        AssetGender randomGender = (AssetGender)Random.Range(0, 1);
+        AssetGender randomGender = (AssetGender)Random.Range(0, 2);
 
         List<CBaseAsset> tempAssets = AvatarCreatorContext.GetLoadedAssetsByType(AssetType.HeadShape);
-        SetFaceObjectPart(tempAssets[Random.Range(0, tempAssets.Count - 1)], false);
+        SetFaceObjectPart(tempAssets[Random.Range(0, tempAssets.Count)], false);
 
         tempAssets = AvatarCreatorContext.GetLoadedAssetsByType(AssetType.Ears);
-        SetFaceObjectPart(tempAssets[Random.Range(0, tempAssets.Count - 1)], false);
+        SetFaceObjectPart(tempAssets[Random.Range(0, tempAssets.Count)], false);
 
         tempAssets = AvatarCreatorContext.GetLoadedAssetsByTypeAndGender(AssetType.Hair, randomGender);
-        SetFaceObjectPart(tempAssets[Random.Range(0, tempAssets.Count - 1)], false);
+        SetFaceObjectPart(tempAssets[Random.Range(0, tempAssets.Count)], false);
 
         tempAssets = AvatarCreatorContext.GetLoadedAssetsByType(AssetType.Eyes);
-        SetFaceObjectPart(tempAssets[Random.Range(0, tempAssets.Count - 1)], false);
+        SetFaceObjectPart(tempAssets[Random.Range(0, tempAssets.Count)], false);
 
         tempAssets = AvatarCreatorContext.GetLoadedAssetsByType(AssetType.Eyebrows);
-        SetFaceObjectPart(tempAssets[Random.Range(0, tempAssets.Count - 1)], false);
+        SetFaceObjectPart(tempAssets[Random.Range(0, tempAssets.Count)], false);
 
         tempAssets = AvatarCreatorContext.GetLoadedAssetsByType(AssetType.Nose);
-        SetFaceObjectPart(tempAssets[Random.Range(0, tempAssets.Count - 1)], false);
+        SetFaceObjectPart(tempAssets[Random.Range(0, tempAssets.Count)], false);
     }
 
     public void SetFaceObjectPart(CBaseAsset asset, bool isUserAction=true)
@@ -68,8 +69,8 @@ public class FaceObjectController : MonoBehaviour
 
         if (asset.GetAssetType() == AssetType.Hair)
         {
-            currentTransform.transform.Find("fo_hair_back").GetComponent<SpriteRenderer>().sprite = asset.GetSprites()[SpritePart.Back];
-            currentTransform.transform.Find("fo_hair_front").GetComponent<SpriteRenderer>().sprite = asset.GetSprites()[SpritePart.Front];
+            currentTransform.transform.Find("fo_hair_back").GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Back];
+            currentTransform.transform.Find("fo_hair_front").GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Front];
         }
         else if (asset.GetAssetType() == AssetType.Eyebrows
                     || asset.GetAssetType() == AssetType.Eyes
@@ -77,12 +78,12 @@ public class FaceObjectController : MonoBehaviour
         {
             for (int i = 0; i < currentTransform.childCount; ++i)
             {
-                currentTransform.GetChild(i).GetComponent<SpriteRenderer>().sprite = asset.GetSprites()[SpritePart.Default];
+                currentTransform.GetChild(i).GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Default];
             }
         }
         else
         {
-            currentTransform.GetComponent<SpriteRenderer>().sprite = asset.GetSprites()[SpritePart.Default];
+            currentTransform.GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Default];
         }
     }
 
@@ -90,11 +91,11 @@ public class FaceObjectController : MonoBehaviour
     {
         if (currentObject.childCount > 0)
         {
-            if (currentObject.GetChild(0).GetComponent<SpriteRenderer>().sprite == currentAsset)
+            if (currentObject.GetChild(0).GetComponent<Image>().sprite == currentAsset)
             {
                 for (int i = 0; i < currentObject.childCount; ++i)
                 {
-                    currentObject.GetChild(i).GetComponent<SpriteRenderer>().sprite = null;
+                    currentObject.GetChild(i).GetComponent<Image>().sprite = null;
                 }
 
                 return true;
@@ -102,9 +103,9 @@ public class FaceObjectController : MonoBehaviour
         }
         else
         {
-            if (currentObject.GetComponent<SpriteRenderer>().sprite == currentAsset)
+            if (currentObject.GetComponent<Image>().sprite == currentAsset)
             {
-                currentObject.GetComponent<SpriteRenderer>().sprite = null;
+                currentObject.GetComponent<Image>().sprite = null;
                 return true;
             }
         }
@@ -180,23 +181,23 @@ public class FaceObjectController : MonoBehaviour
         {
             for (int i = 0; i < currentObject.childCount; ++i)
             {
-                currentObject.GetChild(i).GetComponent<SpriteRenderer>().color = color;
+                currentObject.GetChild(i).GetComponent<Image>().color = color;
             }
         }
         else
         {
-            currentObject.GetComponent<SpriteRenderer>().color = color;
+            currentObject.GetComponent<Image>().color = color;
         }
     }
 
     private void SetSkinColor(Color color)
     {
-        m_transforms[AssetType.HeadShape].GetComponent<SpriteRenderer>().color = color;
+        m_transforms[AssetType.HeadShape].GetComponent<Image>().color = color;
 
-        m_transforms[AssetType.Ears].transform.Find("fo_ear_left").GetComponent<SpriteRenderer>().color = color;
-        m_transforms[AssetType.Ears].transform.Find("fo_ear_right").GetComponent<SpriteRenderer>().color = color;
+        m_transforms[AssetType.Ears].transform.Find("fo_ear_left").GetComponent<Image>().color = color;
+        m_transforms[AssetType.Ears].transform.Find("fo_ear_right").GetComponent<Image>().color = color;
 
-        m_transforms[AssetType.Nose].GetComponent<SpriteRenderer>().color = color;
+        m_transforms[AssetType.Nose].GetComponent<Image>().color = color;
     }
 
     public string Serialize()
@@ -231,8 +232,8 @@ public class FaceObjectController : MonoBehaviour
         string returnStr = "<Object ";
         returnStr += "name=\"" + transform.name + "\" ";
 
-        if (transform.GetComponent<SpriteRenderer>().sprite != null)
-            returnStr += "asset=\"" + transform.GetComponent<SpriteRenderer>().sprite.name + "\" ";
+        if (transform.GetComponent<Image>().sprite != null)
+            returnStr += "asset=\"" + transform.GetComponent<Image>().sprite.name + "\" ";
         else
             returnStr += "asset=\"\" ";
 

@@ -10,10 +10,13 @@ public class ScreenShotCapturer : MonoBehaviour {
         {
             Debug.Log("ScreenShotCapturer:OnPostRender: Capturing screenshot.");
 
-            var width = 400;
-            var height = 500;
-            var startX = 100;
-            var startY = 200;
+            GameObject ssareagameobject = GameObject.Find("screenshot_area");
+            Sprite ssarea = ssareagameobject.GetComponent<SpriteRenderer>().sprite;
+
+            var width = System.Convert.ToInt32(ssarea.bounds.extents.x * 2);
+            var height = System.Convert.ToInt32(ssarea.bounds.extents.y * 2);
+            var startX = System.Convert.ToInt32(ssareagameobject.transform.position.x - ssarea.bounds.extents.x);
+            var startY = System.Convert.ToInt32(ssareagameobject.transform.position.y + ssarea.bounds.extents.y);
             var tex = new Texture2D(width, height, TextureFormat.RGB24, false);
 
             tex.ReadPixels(new Rect(startX, startY, width, height), 0, 0);
@@ -26,5 +29,20 @@ public class ScreenShotCapturer : MonoBehaviour {
 
             AvatarCreatorContext.takeScreenShot = false;
         }
+    }
+
+    private void OnGUI()
+    {
+
+        //GameObject ssareagameobject = GameObject.Find("screenshot_area");
+        //Sprite ssarea = ssareagameobject.GetComponent<SpriteRenderer>().sprite;
+
+        //var width = System.Convert.ToInt32(ssarea.bounds.extents.x * 2);
+        //var height = System.Convert.ToInt32(ssarea.bounds.extents.y * 2);
+        //var startX = System.Convert.ToInt32(ssareagameobject.transform.position.x - ssarea.bounds.extents.x);
+        //var startY = System.Convert.ToInt32(ssareagameobject.transform.position.y + ssarea.bounds.extents.y);
+        //var tex = new Texture2D(width, height, TextureFormat.RGB24, false);
+
+       
     }
 }

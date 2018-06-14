@@ -46,5 +46,7 @@ public class UIGenderButtonController : MonoBehaviour {
             btn.AddComponent<UIScrollViewButtonController>().faceAsset = asset;
             btn.transform.SetParent(scrollView, false);
         }
+
+        AvatarCreatorContext.logManager.LogAction("UIButtonClick", m_assetGender.ToString());
     }
 }
