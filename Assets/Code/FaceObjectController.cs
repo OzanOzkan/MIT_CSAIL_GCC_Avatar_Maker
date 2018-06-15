@@ -16,7 +16,7 @@ public class FaceObjectController : MonoBehaviour
         m_transforms = new Dictionary<AssetType, Transform>();
         m_transforms.Add(AssetType.HeadShape, gameObject.transform.Find("fo_faceshape"));
         m_transforms.Add(AssetType.Ears, gameObject.transform.Find("fo_ears"));
-        m_transforms.Add(AssetType.Hair, gameObject.transform.Find("fo_hair"));
+        m_transforms.Add(AssetType.Hair, gameObject.transform);
         m_transforms.Add(AssetType.Eyes, gameObject.transform.Find("fo_eyes"));
         m_transforms.Add(AssetType.Eyebrows, gameObject.transform.Find("fo_eyebrows"));
         m_transforms.Add(AssetType.Glasses, gameObject.transform.Find("fo_glasses"));
@@ -67,8 +67,8 @@ public class FaceObjectController : MonoBehaviour
 
         if (asset.GetAssetType() == AssetType.Hair)
         {
-            currentTransform.transform.Find("fo_hair_back").GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Back];
-            currentTransform.transform.Find("fo_hair_front").GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Front];
+            currentTransform.Find("fo_hair_back").GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Back];
+            currentTransform.Find("fo_hair_front").GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Front];
         }
         else if (asset.GetAssetType() == AssetType.Eyebrows
                     || asset.GetAssetType() == AssetType.Eyes
