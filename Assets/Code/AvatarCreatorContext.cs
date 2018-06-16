@@ -31,27 +31,27 @@ public class AvatarCreatorContext : MonoBehaviour {
         faceObject = GameObject.Find("FaceObject").GetComponent<FaceObjectController>();
         selectedAssetType = AssetType.None;
 
-        InitAssets("FaceObject/fo_hair/", AssetType.Hair, AssetGender.NoGender);
-        InitAssets("FaceObject/fo_beard/", AssetType.Beard, AssetGender.NoGender);
-
         // No genders are TODO. Depends to the provided content.
-        //InitAssets("FaceObject/fo_faceshape/", AssetType.HeadShape, AssetGender.NoGender);
+        InitAssets("FaceObject/fo_faceshape/", AssetType.HeadShape, AssetGender.NoGender);
+        InitAssets("FaceObject/fo_hair/", AssetType.Hair, AssetGender.NoGender);
+
         //InitAssets("FaceObject/fo_hair/male/", AssetType.Hair, AssetGender.Male);
         //InitAssets("FaceObject/fo_hair/female/", AssetType.Hair, AssetGender.Female);
-        //InitAssets("FaceObject/fo_ears/", AssetType.Ears, AssetGender.NoGender);
-        //InitAssets("FaceObject/fo_eyes/", AssetType.Eyes, AssetGender.NoGender);
-        //InitAssets("FaceObject/fo_eyebrows/", AssetType.Eyebrows, AssetGender.NoGender);
-        //InitAssets("FaceObject/fo_glasses/", AssetType.Glasses, AssetGender.NoGender);
+        InitAssets("FaceObject/fo_ears/", AssetType.Ears, AssetGender.NoGender);
+        InitAssets("FaceObject/fo_eyes/", AssetType.Eyes, AssetGender.NoGender);
+        InitAssets("FaceObject/fo_eyebrows/", AssetType.Eyebrows, AssetGender.NoGender);
+        InitAssets("FaceObject/fo_glasses/", AssetType.Glasses, AssetGender.NoGender);
         //InitAssets("FaceObject/fo_facedetail/", AssetType.FaceTexture, AssetGender.NoGender);
         //InitAssets("FaceObject/fo_nose/", AssetType.Nose, AssetGender.NoGender);
-        //InitAssets("FaceObject/fo_moustache/", AssetType.Moustache, AssetGender.Male);
-        //InitAssets("FaceObject/fo_beard/", AssetType.Beard, AssetGender.Male);
+        InitAssets("FaceObject/fo_moustache/", AssetType.Moustache, AssetGender.NoGender);
+        InitAssets("FaceObject/fo_beard/", AssetType.Beard, AssetGender.NoGender);
+        InitAssets("FaceObject/fo_mouth/", AssetType.Mouth, AssetGender.NoGender);
 
 
         //InitAssets("Assets/Resources/FaceObject/fo_mouth/male/", AssetType.Mouth, AssetGender.Male);          TODO
         //InitAssets("Assets/Resources/FaceObject/fo_mouth/female/", AssetType.Mouth, AssetGender.Female);      TODO
 
-        //faceObject.GenerateRandomAvatar();
+        faceObject.GenerateRandomAvatar();
     }
 
     private void InitAssets(string directoryPath, AssetType assetType, AssetGender assetGender)

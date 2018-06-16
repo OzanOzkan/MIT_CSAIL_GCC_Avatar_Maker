@@ -21,6 +21,6 @@ public class UIScrollViewButtonController : MonoBehaviour
     {
         AvatarCreatorContext.faceObject.SetFaceObjectPart(faceAsset);
 
-        AvatarCreatorContext.logManager.LogAction("AssetSelected", faceAsset.GetSprites()[SpritePart.Default][0].name);
+       //AvatarCreatorContext.logManager.LogAction("AssetSelected", faceAsset.GetSprites()[SpritePart.Default][0].name);
     }
 }

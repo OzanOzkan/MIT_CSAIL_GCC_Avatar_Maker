@@ -24,7 +24,7 @@ public class FaceObjectController : MonoBehaviour
         m_transforms.Add(AssetType.Nose, gameObject.transform.Find("fo_nose"));
         m_transforms.Add(AssetType.Moustache, gameObject.transform.Find("fo_moustache"));
         m_transforms.Add(AssetType.Beard, gameObject.transform.Find("fo_beard"));
-        //m_transforms.Add(AssetType.Mouth, gameObject.transform.Find("fo_mouth"));
+        m_transforms.Add(AssetType.Mouth, gameObject.transform.Find("fo_mouth"));
         // TODO: Body depends to provided assets.
     }
 
@@ -39,11 +39,12 @@ public class FaceObjectController : MonoBehaviour
         tempAssets = AvatarCreatorContext.GetLoadedAssetsByType(AssetType.Ears);
         SetFaceObjectPart(tempAssets[Random.Range(0, tempAssets.Count)], false);
 
-        tempAssets = AvatarCreatorContext.GetLoadedAssetsByTypeAndGender(AssetType.Hair, randomGender);
+        //   tempAssets = AvatarCreatorContext.GetLoadedAssetsByTypeAndGender(AssetType.Hair, randomGender);
+        tempAssets = AvatarCreatorContext.GetLoadedAssetsByType(AssetType.Hair);
         SetFaceObjectPart(tempAssets[Random.Range(0, tempAssets.Count)], false);
 
-        tempAssets = AvatarCreatorContext.GetLoadedAssetsByType(AssetType.Eyes);
-        SetFaceObjectPart(tempAssets[Random.Range(0, tempAssets.Count)], false);
+        //tempAssets = AvatarCreatorContext.GetLoadedAssetsByType(AssetType.Eyes);
+        //SetFaceObjectPart(tempAssets[Random.Range(0, tempAssets.Count)], false);
 
         tempAssets = AvatarCreatorContext.GetLoadedAssetsByType(AssetType.Eyebrows);
         SetFaceObjectPart(tempAssets[Random.Range(0, tempAssets.Count)], false);
@@ -67,18 +68,47 @@ public class FaceObjectController : MonoBehaviour
 
         if (asset.GetAssetType() == AssetType.Hair)
         {
-            currentTransform.Find("fo_hair_front").GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Front][(int)AvatarCreatorContext.currentRealismLevel];
-            if(asset.GetSprites().ContainsKey(SpritePart.Back))
-                currentTransform.Find("fo_hair_back").GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Back][(int)AvatarCreatorContext.currentRealismLevel];
+            Transform hairFront = currentTransform.Find("fo_hair_front");
+            Transform hairBack = currentTransform.Find("fo_hair_back");
+
+            hairFront.GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Front][(int)AvatarCreatorContext.currentRealismLevel];
+
+            if (asset.GetSprites().ContainsKey(SpritePart.Back))
+            {
+                hairBack.gameObject.SetActive(true);
+                hairBack.GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Back][(int)AvatarCreatorContext.currentRealismLevel];
+            }
+            else
+            {
+                hairBack.gameObject.SetActive(false);
+            }
+
         }
         else if (asset.GetAssetType() == AssetType.Eyebrows
-                    || asset.GetAssetType() == AssetType.Eyes
                     || asset.GetAssetType() == AssetType.Ears)
         {
             for (int i = 0; i < currentTransform.childCount; ++i)
             {
                 currentTransform.GetChild(i).GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Default][(int)AvatarCreatorContext.currentRealismLevel];
             }
+        }
+        else if (asset.GetAssetType() == AssetType.Eyes)
+        {
+            Transform eye_left = currentTransform.Find("fo_eye_left");
+            Transform eye_right = currentTransform.Find("fo_eye_right");
+
+            eye_left.Find("L1").GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Back][(int)AvatarCreatorContext.currentRealismLevel];
+            eye_left.Find("L2").GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Default][(int)AvatarCreatorContext.currentRealismLevel];
+            eye_left.Find("L3").GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Front][(int)AvatarCreatorContext.currentRealismLevel];
+
+            eye_right.Find("L1").GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Back][(int)AvatarCreatorContext.currentRealismLevel];
+            eye_right.Find("L2").GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Default][(int)AvatarCreatorContext.currentRealismLevel];
+            eye_right.Find("L3").GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Front][(int)AvatarCreatorContext.currentRealismLevel];
+        }
+        else if (asset.GetAssetType() == AssetType.Mouth)
+        {
+            currentTransform.Find("L1").GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Back][(int)AvatarCreatorContext.currentRealismLevel];
+            currentTransform.Find("L2").GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Default][(int)AvatarCreatorContext.currentRealismLevel];
         }
         else
         {

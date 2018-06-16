@@ -254,6 +254,16 @@ public class CEars : CBaseAsset
 
     protected override void LoadSpriteOverride(string assetPath)
     {
+        List<Sprite> spriteListToLoad = new List<Sprite>()
+            {
+                Resources.Load<Sprite>(assetPath + "_A"),
+                Resources.Load<Sprite>(assetPath + "_B"),
+                Resources.Load<Sprite>(assetPath + "_C"),
+            };
+
+        m_sprites.Add(SpritePart.Default, spriteListToLoad);
+        m_sprites.Add(SpritePart.Left, spriteListToLoad);
+
         // Old implementation
         //m_sprites.Add(SpritePart.Default, Resources.Load<Sprite>(GetResourcePath(assetPath)));
         //m_sprites.Add(SpritePart.Right, Resources.Load<Sprite>(GetResourcePath(assetPath)));
@@ -271,6 +281,33 @@ public class CEyes : CBaseAsset
 
     protected override void LoadSpriteOverride(string assetPath)
     {
+        List<Sprite> nonColorizedLayers = new List<Sprite>()
+            {
+                Resources.Load<Sprite>(assetPath + "_A_L1"),
+                Resources.Load<Sprite>(assetPath + "_B_L1"),
+                Resources.Load<Sprite>(assetPath + "_C_L1")
+            };
+
+        m_sprites.Add(SpritePart.Back, nonColorizedLayers);
+
+        List<Sprite> colorizedLayers = new List<Sprite>()
+            {
+                Resources.Load<Sprite>(assetPath + "_A_L2"),
+                Resources.Load<Sprite>(assetPath + "_B_L2"),
+                Resources.Load<Sprite>(assetPath + "_C_L2")
+            };
+
+        m_sprites.Add(SpritePart.Default, colorizedLayers);
+
+        List<Sprite> topReflectionLayers = new List<Sprite>()
+            {
+                Resources.Load<Sprite>(assetPath + "_A_L3"),
+                Resources.Load<Sprite>(assetPath + "_B_L3"),
+                Resources.Load<Sprite>(assetPath + "_C_L3")
+            };
+
+        m_sprites.Add(SpritePart.Front, topReflectionLayers);
+
         // Old implementation
         //m_sprites.Add(SpritePart.Default, Resources.Load<Sprite>(GetResourcePath(assetPath)));
         //m_sprites.Add(SpritePart.Right, Resources.Load<Sprite>(GetResourcePath(assetPath)));
@@ -289,6 +326,16 @@ public class CEyebrows : CBaseAsset
 
     protected override void LoadSpriteOverride(string assetPath)
     {
+        List<Sprite> spriteListToLoad = new List<Sprite>()
+            {
+                Resources.Load<Sprite>(assetPath + "_A"),
+                Resources.Load<Sprite>(assetPath + "_B"),
+                Resources.Load<Sprite>(assetPath + "_C"),
+            };
+
+        m_sprites.Add(SpritePart.Default, spriteListToLoad);
+        m_sprites.Add(SpritePart.Left, spriteListToLoad);
+
         // Old implementation
         //m_sprites.Add(SpritePart.Default, Resources.Load<Sprite>(GetResourcePath(assetPath)));
         //m_sprites.Add(SpritePart.Left, Resources.Load<Sprite>(GetResourcePath(assetPath)));
@@ -341,8 +388,34 @@ public class CMouth : CBaseAsset
     public CMouth(AssetGender gender, string assetPath)
         : base(gender ,AssetType.Mouth
             , AssetModifyFlag.MoveHorizontal | AssetModifyFlag.Resize | AssetModifyFlag.StretchHorizontal | AssetModifyFlag.StretchVertical
-            , assetPath)
+            , assetPath, true)
     { }
+
+    protected override void LoadSpriteOverride(string assetPath)
+    {
+        List<Sprite> colorizedLayers = new List<Sprite>()
+            {
+                Resources.Load<Sprite>(assetPath + "_A_L1"),
+                Resources.Load<Sprite>(assetPath + "_B_L1"),
+                Resources.Load<Sprite>(assetPath + "_C_L1")
+            };
+
+        m_sprites.Add(SpritePart.Back, colorizedLayers);
+
+        List<Sprite> nonColorizedLayers = new List<Sprite>()
+            {
+                Resources.Load<Sprite>(assetPath + "_A_L2"),
+                Resources.Load<Sprite>(assetPath + "_B_L2"),
+                Resources.Load<Sprite>(assetPath + "_C")
+            };
+
+        m_sprites.Add(SpritePart.Default, nonColorizedLayers);
+
+        // Old implementation
+        //m_sprites.Add(SpritePart.Default, Resources.Load<Sprite>(GetResourcePath(assetPath)));
+        //m_sprites.Add(SpritePart.Right, Resources.Load<Sprite>(GetResourcePath(assetPath)));
+        Debug.Log("CMouth:LoadSpriteOverride: " + GetResourcePath(assetPath));
+    }
 }
 
 // TODO: Body, BG Texture, FG Graphic
