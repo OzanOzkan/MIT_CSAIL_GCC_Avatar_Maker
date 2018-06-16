@@ -61,14 +61,15 @@ public class FaceObjectController : MonoBehaviour
 
         if (isUserAction)
         {
-            if (CheckPreviousAssetAndRemove(currentTransform, asset.GetSprites()[SpritePart.Default]))
-                return;
+            //if (CheckPreviousAssetAndRemove(currentTransform, asset.GetSprites()[SpritePart.Default][0]))
+            //    return;
         }
 
         if (asset.GetAssetType() == AssetType.Hair)
         {
-            currentTransform.Find("fo_hair_back").GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Back];
-            currentTransform.Find("fo_hair_front").GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Front];
+            currentTransform.Find("fo_hair_front").GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Front][(int)AvatarCreatorContext.currentRealismLevel];
+            if(asset.GetSprites().ContainsKey(SpritePart.Back))
+                currentTransform.Find("fo_hair_back").GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Back][(int)AvatarCreatorContext.currentRealismLevel];
         }
         else if (asset.GetAssetType() == AssetType.Eyebrows
                     || asset.GetAssetType() == AssetType.Eyes
@@ -76,12 +77,12 @@ public class FaceObjectController : MonoBehaviour
         {
             for (int i = 0; i < currentTransform.childCount; ++i)
             {
-                currentTransform.GetChild(i).GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Default];
+                currentTransform.GetChild(i).GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Default][(int)AvatarCreatorContext.currentRealismLevel];
             }
         }
         else
         {
-            currentTransform.GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Default];
+            currentTransform.GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Default][(int)AvatarCreatorContext.currentRealismLevel];
         }
     }
 
@@ -196,6 +197,11 @@ public class FaceObjectController : MonoBehaviour
         m_transforms[AssetType.Ears].transform.Find("fo_ear_right").GetComponent<Image>().color = color;
 
         m_transforms[AssetType.Nose].GetComponent<Image>().color = color;
+    }
+
+    public void SetRealismLevel(int level)
+    {
+
     }
 
     public string Serialize()

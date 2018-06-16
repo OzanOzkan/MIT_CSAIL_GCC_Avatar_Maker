@@ -10,6 +10,7 @@ using System.Text;
 public class AvatarCreatorContext : MonoBehaviour {
 
     public static AssetType selectedAssetType { get; set; }
+    public static RealismLevel currentRealismLevel { get; set; }
     public static Dictionary<AssetType, List<CBaseAsset>> m_assets = new Dictionary<AssetType, List<CBaseAsset>>();
     public static FaceObjectController faceObject;
     public static LogManager logManager;
@@ -29,19 +30,24 @@ public class AvatarCreatorContext : MonoBehaviour {
 
         faceObject = GameObject.Find("FaceObject").GetComponent<FaceObjectController>();
         selectedAssetType = AssetType.None;
-        
+
+        InitAssets("FaceObject/fo_hair/", AssetType.Hair, AssetGender.NoGender);
+        InitAssets("FaceObject/fo_beard/", AssetType.Beard, AssetGender.NoGender);
+
         // No genders are TODO. Depends to the provided content.
-        InitAssets("FaceObject/fo_faceshape/", AssetType.HeadShape, AssetGender.NoGender);
-        InitAssets("FaceObject/fo_hair/male/", AssetType.Hair, AssetGender.Male);
-        InitAssets("FaceObject/fo_hair/female/", AssetType.Hair, AssetGender.Female);
-        InitAssets("FaceObject/fo_ears/", AssetType.Ears, AssetGender.NoGender);
-        InitAssets("FaceObject/fo_eyes/", AssetType.Eyes, AssetGender.NoGender);
-        InitAssets("FaceObject/fo_eyebrows/", AssetType.Eyebrows, AssetGender.NoGender);
-        InitAssets("FaceObject/fo_glasses/", AssetType.Glasses, AssetGender.NoGender);
-        InitAssets("FaceObject/fo_facedetail/", AssetType.FaceTexture, AssetGender.NoGender);
-        InitAssets("FaceObject/fo_nose/", AssetType.Nose, AssetGender.NoGender);
-        InitAssets("FaceObject/fo_moustache/", AssetType.Moustache, AssetGender.Male);
-        InitAssets("FaceObject/fo_beard/", AssetType.Beard, AssetGender.Male);
+        //InitAssets("FaceObject/fo_faceshape/", AssetType.HeadShape, AssetGender.NoGender);
+        //InitAssets("FaceObject/fo_hair/male/", AssetType.Hair, AssetGender.Male);
+        //InitAssets("FaceObject/fo_hair/female/", AssetType.Hair, AssetGender.Female);
+        //InitAssets("FaceObject/fo_ears/", AssetType.Ears, AssetGender.NoGender);
+        //InitAssets("FaceObject/fo_eyes/", AssetType.Eyes, AssetGender.NoGender);
+        //InitAssets("FaceObject/fo_eyebrows/", AssetType.Eyebrows, AssetGender.NoGender);
+        //InitAssets("FaceObject/fo_glasses/", AssetType.Glasses, AssetGender.NoGender);
+        //InitAssets("FaceObject/fo_facedetail/", AssetType.FaceTexture, AssetGender.NoGender);
+        //InitAssets("FaceObject/fo_nose/", AssetType.Nose, AssetGender.NoGender);
+        //InitAssets("FaceObject/fo_moustache/", AssetType.Moustache, AssetGender.Male);
+        //InitAssets("FaceObject/fo_beard/", AssetType.Beard, AssetGender.Male);
+
+
         //InitAssets("Assets/Resources/FaceObject/fo_mouth/male/", AssetType.Mouth, AssetGender.Male);          TODO
         //InitAssets("Assets/Resources/FaceObject/fo_mouth/female/", AssetType.Mouth, AssetGender.Female);      TODO
 
@@ -56,14 +62,31 @@ public class AvatarCreatorContext : MonoBehaviour {
         List<CBaseAsset> assets = new List<CBaseAsset>();
 
         Object[] sprites = Resources.LoadAll(directoryPath, typeof(Sprite));
+        string lastLoadedSpriteName = "";
+
         foreach(Sprite sprite in sprites)
         {
-            string spritename = sprite.name + ".png";
-            if (spritename.Contains("b.png")) // TODO: This check is not good... Figure out later.
+            string currentSpriteName = sprite.name.Split('_')[0];
+            if (lastLoadedSpriteName == currentSpriteName)
                 continue;
 
-            assets.Add(assetFactory.CreateAsset(assetType, assetGender, directoryPath + spritename));
+            assets.Add(assetFactory.CreateAsset(assetType, assetGender, directoryPath + currentSpriteName));
+            lastLoadedSpriteName = currentSpriteName;
         }
+
+        // Old implementation
+        //foreach(Sprite sprite in sprites)
+        //{
+        //    string spritename = sprite.name + ".png";
+
+        //    if(spritename.Contains("_L2.png"))
+
+
+        //    if (spritename.Contains("b.png")) // TODO: This check is not good... Figure out later.
+        //        continue;
+
+        //    assets.Add(assetFactory.CreateAsset(assetType, assetGender, directoryPath + spritename));
+        //}
 
         if(m_assets.ContainsKey(assetType))
             m_assets[assetType].AddRange(assets);
@@ -100,9 +123,9 @@ public class AvatarCreatorContext : MonoBehaviour {
         {
             foreach (CBaseAsset currentAsset in currentAssetlist)
             {
-                foreach (KeyValuePair<SpritePart, Sprite> sprite in currentAsset.GetSprites())
+                foreach (KeyValuePair<SpritePart, List<Sprite>> sprites in currentAsset.GetSprites())
                 {
-                    if (sprite.Value.name == name)
+                    if (sprites.Value[0].name == name)
                         return currentAsset;
                 }
             }
@@ -115,9 +138,9 @@ public class AvatarCreatorContext : MonoBehaviour {
     {
         foreach (CBaseAsset currentAsset in m_assets[type])
         {
-            foreach (KeyValuePair<SpritePart, Sprite> sprite in currentAsset.GetSprites())
+            foreach (KeyValuePair<SpritePart, List<Sprite>> sprites in currentAsset.GetSprites())
             {
-                if (sprite.Value.name == name)
+                if (sprites.Value[0].name == name)
                     return currentAsset;
             }
         }

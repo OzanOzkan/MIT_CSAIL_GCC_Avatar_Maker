@@ -56,6 +56,13 @@ public enum SpritePart
     Left,
     Right
 }
+
+public enum RealismLevel
+{
+    A,
+    B,
+    C
+}
 #endregion
 
 public class CBaseAsset
@@ -64,7 +71,8 @@ public class CBaseAsset
     protected AssetGender m_assetGender;
     protected AssetType m_assetType;
     protected AssetModifyFlag m_modifyFlags;
-    protected Dictionary<SpritePart, Sprite> m_sprites;  // TODO: protected Dictionary<RealismLevel, Dictionary<SpritePart, Sprite>> m_sprites;
+   // protected Dictionary<SpritePart, Sprite> m_sprites;  // TODO: protected Dictionary<RealismLevel, Dictionary<SpritePart, Sprite>> m_sprites;
+    protected Dictionary<SpritePart, List<Sprite>> m_sprites;
     #endregion
 
     public CBaseAsset(AssetGender gender, AssetType assetType, AssetModifyFlag modifyFlags, string assetPath, bool loadSpriteOverride=false)
@@ -81,24 +89,48 @@ public class CBaseAsset
     #region Shared Methods
     protected void LoadSprite(string assetPath, bool isOverride)
     {
-        m_sprites = new Dictionary<SpritePart, Sprite>();
+        // m_sprites = new Dictionary<SpritePart, Sprite>();
+        m_sprites = new Dictionary<SpritePart, List<Sprite>>();
 
         if (!isOverride)
         {
-            if (assetPath.Length > 0)
-            {
-                m_sprites.Add(SpritePart.Default, Resources.Load<Sprite>(GetResourcePath(assetPath)));
-                Debug.Log("CBaseAsset:LoadSprite: " + GetResourcePath(assetPath));
+            List<Sprite> spriteListToLoad = new List<Sprite>(); // Dummy init.
 
-                return;
+            // Realism?
+            if (Resources.Load<Sprite>(assetPath + "_A"))
+            {
+                spriteListToLoad = new List<Sprite>()
+                {
+                    Resources.Load<Sprite>(assetPath + "_A"),
+                    Resources.Load<Sprite>(assetPath + "_B"),
+                    Resources.Load<Sprite>(assetPath + "_C"),
+                };
+            }
+            else
+            {
+                spriteListToLoad = new List<Sprite>()
+                {
+                    Resources.Load<Sprite>(assetPath),
+                };
             }
 
-            // For the dummy CBaseAsset creation.
-            m_sprites.Add(SpritePart.Default, null);
-            m_sprites.Add(SpritePart.Front, null);
-            m_sprites.Add(SpritePart.Back, null);
-            m_sprites.Add(SpritePart.Left, null);
-            m_sprites.Add(SpritePart.Right, null);
+            m_sprites.Add(SpritePart.Default, spriteListToLoad);
+
+            // Old implementation
+            //if (assetPath.Length > 0)
+            //{
+            //    m_sprites.Add(SpritePart.Default, Resources.Load<Sprite>(GetResourcePath(assetPath)));
+            //    Debug.Log("CBaseAsset:LoadSprite: " + GetResourcePath(assetPath));
+
+            //    return;
+            //}
+
+            //// For the dummy CBaseAsset creation.
+            //m_sprites.Add(SpritePart.Default, null);
+            //m_sprites.Add(SpritePart.Front, null);
+            //m_sprites.Add(SpritePart.Back, null);
+            //m_sprites.Add(SpritePart.Left, null);
+            //m_sprites.Add(SpritePart.Right, null);
         }
         else
         {
@@ -111,7 +143,7 @@ public class CBaseAsset
     public AssetType GetAssetType() { return m_assetType; }
     public AssetGender GetGender() { return m_assetGender; }
     public AssetModifyFlag GetModifyFlags() { return m_modifyFlags; }
-    public Dictionary<SpritePart, Sprite> GetSprites() { return m_sprites; }
+    public Dictionary<SpritePart, List<Sprite>> GetSprites() { return m_sprites; }
     protected string GetResourcePath(string rawAssetPath) { return rawAssetPath.Replace(".png", ""); }
     #endregion
 }
@@ -169,10 +201,46 @@ public class CHair : CBaseAsset
 
     protected override void LoadSpriteOverride(string assetPath)
     {
-        m_sprites.Add(SpritePart.Default, Resources.Load<Sprite>(assetPath.Replace("a.png", "a")));
-        m_sprites.Add(SpritePart.Front, Resources.Load<Sprite>(assetPath.Replace("a.png", "a")));
-        m_sprites.Add(SpritePart.Back, Resources.Load<Sprite>(assetPath.Replace("a.png", "b")));
-        Debug.Log("CHair:LoadSpriteOverride: " + GetResourcePath(assetPath));
+        Sprite spriteToLoad;
+
+        // Layered?
+        if(spriteToLoad = Resources.Load<Sprite>(assetPath + "_A_L1"))
+        {
+            List<Sprite> backLayers = new List<Sprite>()
+            {
+                Resources.Load<Sprite>(assetPath + "_A_L1"),
+                Resources.Load<Sprite>(assetPath + "_B_L1"),
+                Resources.Load<Sprite>(assetPath + "_C_L1")
+            };
+
+            m_sprites.Add(SpritePart.Back, backLayers);
+
+            List<Sprite> frontLayers = new List<Sprite>()
+            {
+                Resources.Load<Sprite>(assetPath + "_A_L2"),
+                Resources.Load<Sprite>(assetPath + "_B_L2"),
+                Resources.Load<Sprite>(assetPath + "_C_L2")
+            };
+
+            m_sprites.Add(SpritePart.Front, backLayers);
+        }
+        else
+        {
+            List<Sprite> spriteListToLoad = new List<Sprite>()
+            {
+                Resources.Load<Sprite>(assetPath + "_A"),
+                Resources.Load<Sprite>(assetPath + "_B"),
+                Resources.Load<Sprite>(assetPath + "_C"),
+            };
+
+            m_sprites.Add(SpritePart.Front, spriteListToLoad);
+        }
+
+        // Old Implementation
+        //m_sprites.Add(SpritePart.Default, Resources.Load<Sprite>(assetPath.Replace("a.png", "a")));
+        //m_sprites.Add(SpritePart.Front, Resources.Load<Sprite>(assetPath.Replace("a.png", "a")));
+        //m_sprites.Add(SpritePart.Back, Resources.Load<Sprite>(assetPath.Replace("a.png", "b")));
+        //Debug.Log("CHair:LoadSpriteOverride: " + GetResourcePath(assetPath));
     }
 }
 
@@ -186,8 +254,9 @@ public class CEars : CBaseAsset
 
     protected override void LoadSpriteOverride(string assetPath)
     {
-        m_sprites.Add(SpritePart.Default, Resources.Load<Sprite>(GetResourcePath(assetPath)));
-        m_sprites.Add(SpritePart.Right, Resources.Load<Sprite>(GetResourcePath(assetPath)));
+        // Old implementation
+        //m_sprites.Add(SpritePart.Default, Resources.Load<Sprite>(GetResourcePath(assetPath)));
+        //m_sprites.Add(SpritePart.Right, Resources.Load<Sprite>(GetResourcePath(assetPath)));
         Debug.Log("CEars:LoadSpriteOverride: " + GetResourcePath(assetPath));
     }
 }
@@ -202,8 +271,9 @@ public class CEyes : CBaseAsset
 
     protected override void LoadSpriteOverride(string assetPath)
     {
-        m_sprites.Add(SpritePart.Default, Resources.Load<Sprite>(GetResourcePath(assetPath)));
-        m_sprites.Add(SpritePart.Right, Resources.Load<Sprite>(GetResourcePath(assetPath)));
+        // Old implementation
+        //m_sprites.Add(SpritePart.Default, Resources.Load<Sprite>(GetResourcePath(assetPath)));
+        //m_sprites.Add(SpritePart.Right, Resources.Load<Sprite>(GetResourcePath(assetPath)));
         Debug.Log("CEyes:LoadSpriteOverride: " + GetResourcePath(assetPath));
     }
 }
@@ -219,8 +289,9 @@ public class CEyebrows : CBaseAsset
 
     protected override void LoadSpriteOverride(string assetPath)
     {
-        m_sprites.Add(SpritePart.Default, Resources.Load<Sprite>(GetResourcePath(assetPath)));
-        m_sprites.Add(SpritePart.Left, Resources.Load<Sprite>(GetResourcePath(assetPath)));
+        // Old implementation
+        //m_sprites.Add(SpritePart.Default, Resources.Load<Sprite>(GetResourcePath(assetPath)));
+        //m_sprites.Add(SpritePart.Left, Resources.Load<Sprite>(GetResourcePath(assetPath)));
         Debug.Log("CEyebrows:LoadSpriteOverride: " + GetResourcePath(assetPath));
     }
 }
