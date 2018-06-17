@@ -25,7 +25,16 @@ public class FaceObjectController : MonoBehaviour
         m_transforms.Add(AssetType.Moustache, gameObject.transform.Find("fo_moustache"));
         m_transforms.Add(AssetType.Beard, gameObject.transform.Find("fo_beard"));
         m_transforms.Add(AssetType.Mouth, gameObject.transform.Find("fo_mouth"));
-        // TODO: Body depends to provided assets.
+        m_transforms.Add(AssetType.Body, gameObject.transform.Find("fo_body"));
+    }
+
+    private void Update()
+    {
+        // Manage visibility of empty sprites. (Empty sprites displays as white planes)
+        foreach(Transform currentTransform in m_transforms.Values)
+        {
+            ManageSpriteVisibility(currentTransform);
+        }
     }
 
     public void GenerateRandomAvatar()
@@ -51,6 +60,26 @@ public class FaceObjectController : MonoBehaviour
 
         tempAssets = AvatarCreatorContext.GetLoadedAssetsByType(AssetType.Nose);
         SetFaceObjectPart(tempAssets[Random.Range(0, tempAssets.Count)], false);
+    }
+
+    private void ManageSpriteVisibility(Transform root)
+    {
+        if (root.childCount == 0)
+        {
+            if (root.GetComponent<Image>().sprite == null)
+                root.gameObject.SetActive(false);
+            else
+                root.gameObject.SetActive(true);
+
+            return;
+        }
+        else
+        {
+            for (int i = 0; i < root.childCount; ++i)
+            {
+                ManageSpriteVisibility(root.GetChild(i));
+            }
+        }
     }
 
     public void SetFaceObjectPart(CBaseAsset asset, bool isUserAction=true)
@@ -106,6 +135,21 @@ public class FaceObjectController : MonoBehaviour
             eye_right.Find("L3").GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Front][(int)AvatarCreatorContext.currentRealismLevel];
         }
         else if (asset.GetAssetType() == AssetType.Mouth)
+        {
+            currentTransform.Find("L1").GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Back][(int)AvatarCreatorContext.currentRealismLevel];
+            currentTransform.Find("L2").GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Default][(int)AvatarCreatorContext.currentRealismLevel];
+
+            //if (currentTransform.Find("L1").GetComponent<Image>().sprite == null)
+            //    currentTransform.Find("L1").gameObject.SetActive(false);
+            //else
+            //    currentTransform.Find("L1").gameObject.SetActive(true);
+
+            //if (currentTransform.Find("L2").GetComponent<Image>().sprite == null)
+            //    currentTransform.Find("L2").gameObject.SetActive(false);
+            //else
+            //    currentTransform.Find("L2").gameObject.SetActive(true);
+        }
+        else if(asset.GetAssetType() == AssetType.Body)
         {
             currentTransform.Find("L1").GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Back][(int)AvatarCreatorContext.currentRealismLevel];
             currentTransform.Find("L2").GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Default][(int)AvatarCreatorContext.currentRealismLevel];

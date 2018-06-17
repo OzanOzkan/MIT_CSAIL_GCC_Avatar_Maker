@@ -41,12 +41,12 @@ public class AvatarCreatorContext : MonoBehaviour {
         InitAssets("FaceObject/fo_eyes/", AssetType.Eyes, AssetGender.NoGender);
         InitAssets("FaceObject/fo_eyebrows/", AssetType.Eyebrows, AssetGender.NoGender);
         InitAssets("FaceObject/fo_glasses/", AssetType.Glasses, AssetGender.NoGender);
-        //InitAssets("FaceObject/fo_facedetail/", AssetType.FaceTexture, AssetGender.NoGender);
+        InitAssets("FaceObject/fo_facedetail/", AssetType.FaceTexture, AssetGender.NoGender);
         //InitAssets("FaceObject/fo_nose/", AssetType.Nose, AssetGender.NoGender);
         InitAssets("FaceObject/fo_moustache/", AssetType.Moustache, AssetGender.NoGender);
         InitAssets("FaceObject/fo_beard/", AssetType.Beard, AssetGender.NoGender);
         InitAssets("FaceObject/fo_mouth/", AssetType.Mouth, AssetGender.NoGender);
-
+        InitAssets("FaceObject/fo_body/", AssetType.Body, AssetGender.NoGender);
 
         //InitAssets("Assets/Resources/FaceObject/fo_mouth/male/", AssetType.Mouth, AssetGender.Male);          TODO
         //InitAssets("Assets/Resources/FaceObject/fo_mouth/female/", AssetType.Mouth, AssetGender.Female);      TODO

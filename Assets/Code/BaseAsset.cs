@@ -176,6 +176,8 @@ public class CBaseAssetFactory
                 return new CBeard(gender, assetPath);
             case AssetType.Mouth:
                 return new CMouth(gender, assetPath);
+            case AssetType.Body:
+                return new CBody(gender, assetPath);
         }
 
         return null;
@@ -418,4 +420,32 @@ public class CMouth : CBaseAsset
     }
 }
 
-// TODO: Body, BG Texture, FG Graphic
+public class CBody : CBaseAsset
+{
+    public CBody(AssetGender gender, string assetPath)
+        : base(gender, AssetType.Body
+            , AssetModifyFlag.Resize | AssetModifyFlag.StretchHorizontal | AssetModifyFlag.StretchVertical
+            , assetPath, true)
+    { }
+
+    protected override void LoadSpriteOverride(string assetPath)
+    {
+        List<Sprite> nonColorizedLayers = new List<Sprite>()
+            {
+                Resources.Load<Sprite>(assetPath + "_A_L1")
+            };
+
+        m_sprites.Add(SpritePart.Back, nonColorizedLayers);
+
+        List<Sprite> colorizedLayers = new List<Sprite>()
+            {
+                Resources.Load<Sprite>(assetPath + "_A_L2")
+            };
+
+        m_sprites.Add(SpritePart.Default, colorizedLayers);
+
+        Debug.Log("CBody:LoadSpriteOverride: " + GetResourcePath(assetPath));
+    }
+}
+
+// TODO: BG Texture, FG Graphic
