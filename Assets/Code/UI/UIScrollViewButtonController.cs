@@ -11,8 +11,8 @@ public class UIScrollViewButtonController : MonoBehaviour
     {
         //gameObject.GetComponent<Image>().sprite = faceAsset.GetSprites()[SpritePart.Default];
         gameObject.GetComponent<Button>().onClick.AddListener(() => OnButtonClick());
-        GameObject btnFaceObject = Instantiate(AvatarCreatorContext.faceObject.gameObject, gameObject.transform);
-        btnFaceObject.transform.localScale = new Vector3(6, 6, 6);
+        GameObject btnFaceObject = Instantiate(AvatarCreatorContext.faceObject.gameObject, gameObject.transform.Find("Panel"));
+        btnFaceObject.transform.localScale = new Vector3(3, 3, 3);
         //btnFaceObject.transform.position = new Vector3(btnFaceObject.transform.position.x, -5f, btnFaceObject.transform.position.z);
         btnFaceObject.GetComponent<FaceObjectController>().SetFaceObjectPart(faceAsset, false);
     }
