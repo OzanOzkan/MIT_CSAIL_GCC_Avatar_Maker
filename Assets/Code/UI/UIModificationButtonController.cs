@@ -39,9 +39,13 @@ public class UIModificationButtonController : MonoBehaviour {
     {
         if (m_buttonType == AssetModifyFlag.MoveHorizontal || m_buttonType == AssetModifyFlag.MoveVertical)
             AvatarCreatorContext.faceObject.MoveAsset(m_buttonType, positiveRate);
-        else if (m_buttonType == AssetModifyFlag.Resize 
+        else if (m_buttonType == AssetModifyFlag.Resize
                 || m_buttonType == AssetModifyFlag.StretchVertical || m_buttonType == AssetModifyFlag.StretchHorizontal)
             AvatarCreatorContext.faceObject.ResizeAsset(m_buttonType, positiveRate);
+        else if (m_buttonType == AssetModifyFlag.ChangeDistance)
+            AvatarCreatorContext.faceObject.SetDistance(positiveRate);
+        else if (m_buttonType == AssetModifyFlag.Rotate)
+            AvatarCreatorContext.faceObject.RotateAsset(positiveRate);
 
         AvatarCreatorContext.logManager.LogAction("FaceAssetModified", m_buttonType.ToString() + positiveRate.ToString());
     }

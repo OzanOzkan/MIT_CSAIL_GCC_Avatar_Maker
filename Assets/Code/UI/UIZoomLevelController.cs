@@ -20,5 +20,6 @@ public class UIZoomLevelController : MonoBehaviour {
         float sliderValue = gameObject.GetComponent<Slider>().value;
 
         AvatarCreatorContext.faceObject.transform.localScale = new Vector3(sliderValue, sliderValue, 0);
+        //AvatarCreatorContext.faceObject.transform.position = new Vector3(AvatarCreatorContext.faceObject.transform.position.x, AvatarCreatorContext.faceObject.transform.position.y - (sliderValue*2), 0);
     }
 }

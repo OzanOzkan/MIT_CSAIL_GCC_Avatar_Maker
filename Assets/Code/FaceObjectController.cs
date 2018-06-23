@@ -240,37 +240,116 @@ public class FaceObjectController : MonoBehaviour
         }
     }
 
-    public void ChangeAssetColor(Color color)
+    // false: left, true: right
+    public void SetDistance(bool direction)
     {
-        if (AvatarCreatorContext.selectedAssetType == AssetType.HeadShape)
-        {
-            SetSkinColor(color);
-            return;
-        }
-
         Transform currentObject = m_transforms[AvatarCreatorContext.selectedAssetType];
 
-        if (currentObject.childCount > 0)
+        float distanceOffset = 1f;
+
+        Transform left = currentObject.transform.GetChild(0);
+        Transform right = currentObject.transform.GetChild(1);
+
+        if (direction)
         {
-            for (int i = 0; i < currentObject.childCount; ++i)
-            {
-                currentObject.GetChild(i).GetComponent<Image>().color = color;
-            }
+            left.position = new Vector3(left.position.x - distanceOffset, left.position.y, 0);
+            right.position = new Vector3(right.position.x + distanceOffset, right.position.y, 0);
         }
         else
         {
-            currentObject.GetComponent<Image>().color = color;
+            left.position = new Vector3(left.position.x + distanceOffset, left.position.y, 0);
+            right.position = new Vector3(right.position.x - distanceOffset, right.position.y, 0);
         }
     }
 
-    private void SetSkinColor(Color color)
+    public void RotateAsset(bool direction)
     {
-        m_transforms[AssetType.HeadShape].GetComponent<Image>().color = color;
+        Transform currentObject = m_transforms[AvatarCreatorContext.selectedAssetType];
 
-        m_transforms[AssetType.Ears].transform.Find("fo_ear_left").GetComponent<Image>().color = color;
-        m_transforms[AssetType.Ears].transform.Find("fo_ear_right").GetComponent<Image>().color = color;
+        float rotateOffset = 1f;
 
-        m_transforms[AssetType.Nose].GetComponent<Image>().color = color;
+        Transform left = currentObject.transform.GetChild(0);
+        Transform right = currentObject.transform.GetChild(1);
+
+        if (left.rotation.eulerAngles.z > -30 && left.rotation.eulerAngles.z < 30)
+        {
+            if (direction)
+            {
+                //left.localEulerAngles = new Vector3(0, 0, left.rotation.z + rotateOffset);
+                //right.localEulerAngles = new Vector3(0, 0, left.rotation.z - rotateOffset);
+                left.Rotate(0, 0, left.rotation.z + rotateOffset);
+                right.Rotate(0, 0, right.rotation.z - rotateOffset);
+
+                // left.rotation = Quaternion.Euler(0, 0, left.rotation.z + rotateOffset); 
+                // right.rotation = Quaternion.Euler(0, 0, left.rotation.z - rotateOffset);
+            }
+            else
+            {
+                left.Rotate(0, 0, left.rotation.z - rotateOffset);
+                right.Rotate(0, 0, right.rotation.z + rotateOffset);
+            }
+        }
+    }
+
+    public void ChangeAssetColor(Color color)
+    {
+        Transform currentObject = m_transforms[AvatarCreatorContext.selectedAssetType];
+
+        switch (AvatarCreatorContext.selectedAssetType)
+        {
+            case AssetType.HeadShape:
+                {
+                    m_transforms[AssetType.HeadShape].GetComponent<Image>().color = color;
+
+                    m_transforms[AssetType.Ears].transform.Find("fo_ear_left").GetComponent<Image>().color = color;
+                    m_transforms[AssetType.Ears].transform.Find("fo_ear_right").GetComponent<Image>().color = color;
+               
+                    m_transforms[AssetType.Nose].GetComponent<Image>().color = color;
+                    break;
+                }
+            case AssetType.Mouth:
+                {
+                    currentObject.Find("L1").GetComponent<Image>().color = color;
+                    break;
+                }
+            case AssetType.Hair:
+                {
+                    currentObject.Find("fo_hair_front").GetComponent<Image>().color = color;
+                    currentObject.Find("fo_hair_back").GetComponent<Image>().color = color;
+                    break;
+                }
+            case AssetType.Moustache:
+            case AssetType.Beard:
+                {
+                    m_transforms[AssetType.Moustache].GetComponent<Image>().color = color;
+                    m_transforms[AssetType.Beard].GetComponent<Image>().color = color;
+                    break;
+                }
+            case AssetType.Eyes:
+                {
+                    currentObject.Find("fo_eye_left").Find("L2").GetComponent<Image>().color = color;
+                    currentObject.Find("fo_eye_right").Find("L2").GetComponent<Image>().color = color;
+                    break;
+                }
+            case AssetType.Eyebrows:
+                {
+                    currentObject.Find("fo_eyebrow_left").GetComponent<Image>().color = color;
+                    currentObject.Find("fo_eyebrow_right").GetComponent<Image>().color = color;
+                    break;
+                }
+        }        
+
+        //if (currentObject.childCount > 0)
+        //{
+        //    for (int i = 0; i < currentObject.childCount; ++i)
+        //    {
+        //        currentObject.GetChild(i).GetComponent<Image>().color = color;
+        //    }
+        //}
+        //else
+        //{
+        //    currentObject.GetComponent<Image>().color = color;
+        //}
     }
 
     public void SetRealismLevel(int level)
