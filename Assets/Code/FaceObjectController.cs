@@ -190,53 +190,93 @@ public class FaceObjectController : MonoBehaviour
     {
         Transform currentObject = m_transforms[AvatarCreatorContext.selectedAssetType];
 
+        float maxVertical = 9f;
+        float maxHorizontal = 5f;
+
         float moveOffset = 0.5f;
-        Vector3 tempPos = currentObject.position;
+        Vector3 tempPos = currentObject.localPosition;
 
         if(modifyFlag == AssetModifyFlag.MoveVertical)
         {
             if (isPositiveRate)
-                tempPos.y += moveOffset;
+            {
+                if (tempPos.y < maxVertical)
+                    tempPos.y += moveOffset;
+            }
             else
-                tempPos.y -= moveOffset;
+            {
+                if(tempPos.y > -maxVertical)
+                    tempPos.y -= moveOffset;
+            }
         }
         else
         {
             if (isPositiveRate)
-                tempPos.x += moveOffset;
+            {
+                if (tempPos.x < maxHorizontal)
+                    tempPos.x += moveOffset;
+            }
             else
-                tempPos.x -= moveOffset;
+            {
+                if (tempPos.x > -maxHorizontal)
+                    tempPos.x -= moveOffset;
+            }
         }
 
-        currentObject.position = tempPos;
+        currentObject.localPosition = tempPos;
     }
 
     public void ResizeAsset(AssetModifyFlag modifyFlag, bool isPositiveRate)
     {
         Transform currentObject = m_transforms[AvatarCreatorContext.selectedAssetType];
 
+        // get current size
+        // calculate new size
+        // check if it is bigger or smaller than %10 of original.
+        // if not, do it.
+
+        Vector3 maxScale = new Vector3(1.1f, 1.1f, 0);
+        Vector3 minScale = new Vector3(0.9f, 0.9f, 0);
         float resizeOffset = 0.1f;
 
         if(modifyFlag == AssetModifyFlag.Resize)
         {
             if (isPositiveRate)
-                currentObject.localScale = new Vector3(currentObject.localScale.x + resizeOffset, currentObject.localScale.y + resizeOffset, 0);
+            {
+                if(currentObject.localScale.x < maxScale.x && currentObject.localScale.y < maxScale.y)
+                    currentObject.localScale = new Vector3(currentObject.localScale.x + resizeOffset, currentObject.localScale.y + resizeOffset, 0);
+            }
             else
-                currentObject.localScale = new Vector3(currentObject.localScale.x - resizeOffset, currentObject.localScale.y - resizeOffset, 0);
+            {
+                if(currentObject.localScale.x > minScale.x && currentObject.localScale.y > minScale.y)
+                    currentObject.localScale = new Vector3(currentObject.localScale.x - resizeOffset, currentObject.localScale.y - resizeOffset, 0);
+            }
         }
         else if(modifyFlag == AssetModifyFlag.StretchHorizontal)
         {
-            if(isPositiveRate)
-                currentObject.localScale = new Vector3(currentObject.localScale.x + resizeOffset, currentObject.localScale.y, 0);
+            if (isPositiveRate)
+            {
+                if (currentObject.localScale.x < maxScale.x)
+                    currentObject.localScale = new Vector3(currentObject.localScale.x + resizeOffset, currentObject.localScale.y, 0);
+            }
             else
-                currentObject.localScale = new Vector3(currentObject.localScale.x - resizeOffset, currentObject.localScale.y, 0);
+            {
+                if(currentObject.localScale.x > maxScale.x)
+                    currentObject.localScale = new Vector3(currentObject.localScale.x - resizeOffset, currentObject.localScale.y, 0);
+            }
         }
         else if(modifyFlag == AssetModifyFlag.StretchVertical)
         {
-            if(isPositiveRate)
-                currentObject.localScale = new Vector3(currentObject.localScale.x, currentObject.localScale.y + resizeOffset, 0);
+            if (isPositiveRate)
+            {
+                if (currentObject.localScale.y < maxScale.y)
+                    currentObject.localScale = new Vector3(currentObject.localScale.x, currentObject.localScale.y + resizeOffset, 0);
+            }
             else
-                currentObject.localScale = new Vector3(currentObject.localScale.x, currentObject.localScale.y - resizeOffset, 0);
+            {
+                if(currentObject.localScale.y > maxScale.y)
+                    currentObject.localScale = new Vector3(currentObject.localScale.x, currentObject.localScale.y - resizeOffset, 0);
+            }
         }
     }
 
