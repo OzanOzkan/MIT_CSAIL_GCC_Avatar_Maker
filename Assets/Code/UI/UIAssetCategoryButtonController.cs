@@ -37,6 +37,11 @@ public class UIAssetCategoryButtonController : MonoBehaviour
             FillScrollList(AssetType.Beard);
             FillScrollList(AssetType.Moustache);
         }
+        else if(m_assetType == AssetType.Ears)
+        {
+            FillScrollList(AssetType.Ears);
+            FillScrollList(AssetType.Nose);
+        }
         else
         {
             FillScrollList(m_assetType);

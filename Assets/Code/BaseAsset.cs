@@ -224,7 +224,7 @@ public class CHair : CBaseAsset
                 Resources.Load<Sprite>(assetPath + "_C_L2")
             };
 
-            m_sprites.Add(SpritePart.Front, backLayers);
+            m_sprites.Add(SpritePart.Front, frontLayers);
         }
         else
         {

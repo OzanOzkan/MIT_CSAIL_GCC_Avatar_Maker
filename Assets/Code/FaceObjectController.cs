@@ -104,12 +104,12 @@ public class FaceObjectController : MonoBehaviour
 
             if (asset.GetSprites().ContainsKey(SpritePart.Back))
             {
-                hairBack.gameObject.SetActive(true);
                 hairBack.GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Back][(int)AvatarCreatorContext.currentRealismLevel];
+                ChangeAssetColor(hairFront.GetComponent<Image>().color);
             }
             else
             {
-                hairBack.gameObject.SetActive(false);
+                hairBack.GetComponent<Image>().sprite = null;
             }
 
         }
@@ -235,9 +235,9 @@ public class FaceObjectController : MonoBehaviour
         // check if it is bigger or smaller than %10 of original.
         // if not, do it.
 
-        Vector3 maxScale = new Vector3(1.1f, 1.1f, 0);
-        Vector3 minScale = new Vector3(0.9f, 0.9f, 0);
-        float resizeOffset = 0.1f;
+        Vector3 maxScale = new Vector3(1.2f, 1.2f, 0);
+        Vector3 minScale = new Vector3(0.8f, 0.8f, 0);
+        float resizeOffset = 0.05f;
 
         if(modifyFlag == AssetModifyFlag.Resize)
         {
@@ -261,7 +261,7 @@ public class FaceObjectController : MonoBehaviour
             }
             else
             {
-                if(currentObject.localScale.x > maxScale.x)
+                if(currentObject.localScale.x > minScale.x)
                     currentObject.localScale = new Vector3(currentObject.localScale.x - resizeOffset, currentObject.localScale.y, 0);
             }
         }
@@ -274,7 +274,7 @@ public class FaceObjectController : MonoBehaviour
             }
             else
             {
-                if(currentObject.localScale.y > maxScale.y)
+                if(currentObject.localScale.y > minScale.y)
                     currentObject.localScale = new Vector3(currentObject.localScale.x, currentObject.localScale.y - resizeOffset, 0);
             }
         }
@@ -306,28 +306,29 @@ public class FaceObjectController : MonoBehaviour
     {
         Transform currentObject = m_transforms[AvatarCreatorContext.selectedAssetType];
 
+      //  float maxAngle = 30f;
         float rotateOffset = 1f;
 
         Transform left = currentObject.transform.GetChild(0);
         Transform right = currentObject.transform.GetChild(1);
 
-        if (left.rotation.eulerAngles.z > -30 && left.rotation.eulerAngles.z < 30)
-        {
-            if (direction)
-            {
-                //left.localEulerAngles = new Vector3(0, 0, left.rotation.z + rotateOffset);
-                //right.localEulerAngles = new Vector3(0, 0, left.rotation.z - rotateOffset);
-                left.Rotate(0, 0, left.rotation.z + rotateOffset);
-                right.Rotate(0, 0, right.rotation.z - rotateOffset);
+       // Debug.Log("Left: " + left.localEulerAngles.z + " Right:" + right.localEulerAngles.z);
 
-                // left.rotation = Quaternion.Euler(0, 0, left.rotation.z + rotateOffset); 
-                // right.rotation = Quaternion.Euler(0, 0, left.rotation.z - rotateOffset);
-            }
-            else
-            {
-                left.Rotate(0, 0, left.rotation.z - rotateOffset);
-                right.Rotate(0, 0, right.rotation.z + rotateOffset);
-            }
+        if (direction) // right
+        {
+                right.Rotate(0, 0, -rotateOffset);
+                left.rotation = Quaternion.Inverse(right.localRotation);
+
+            //left.Rotate(0, 0, rotateOffset);
+            //right.Rotate(0, 0, -rotateOffset);
+        }
+        else // left
+        {
+                left.Rotate(0, 0, -rotateOffset);
+                right.rotation = Quaternion.Inverse(left.localRotation);
+
+            //left.Rotate(0, 0, -rotateOffset);
+            //right.Rotate(0, 0, rotateOffset);
         }
     }
 

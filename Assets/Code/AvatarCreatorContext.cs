@@ -18,6 +18,9 @@ public class AvatarCreatorContext : MonoBehaviour {
     public static bool takeScreenShot = false;
     public static System.Guid sessionguid;
 
+    public static Transform defaultColorPalette;
+    public static Transform skinColorPalette;
+
     // Use this for initialization
     void Start () {
         DontDestroyOnLoad(this.gameObject);
@@ -42,7 +45,7 @@ public class AvatarCreatorContext : MonoBehaviour {
         InitAssets("FaceObject/fo_eyebrows/", AssetType.Eyebrows, AssetGender.NoGender);
         InitAssets("FaceObject/fo_glasses/", AssetType.Glasses, AssetGender.NoGender);
         InitAssets("FaceObject/fo_facedetail/", AssetType.FaceTexture, AssetGender.NoGender);
-        //InitAssets("FaceObject/fo_nose/", AssetType.Nose, AssetGender.NoGender);
+        InitAssets("FaceObject/fo_nose/", AssetType.Nose, AssetGender.NoGender);
         InitAssets("FaceObject/fo_moustache/", AssetType.Moustache, AssetGender.NoGender);
         InitAssets("FaceObject/fo_beard/", AssetType.Beard, AssetGender.NoGender);
         InitAssets("FaceObject/fo_mouth/", AssetType.Mouth, AssetGender.NoGender);
@@ -54,9 +57,36 @@ public class AvatarCreatorContext : MonoBehaviour {
         // Set the default selected category as Body.
         GameObject.Find("btn_body").GetComponent<UIAssetCategoryButtonController>().OnButtonClick();
 
-        UpdateColorPalette();
+        defaultColorPalette = GameObject.Find("colorpalette_default").transform;
+        defaultColorPalette.gameObject.SetActive(false);
+        skinColorPalette = GameObject.Find("colorpalette_skin").transform;
+        skinColorPalette.gameObject.SetActive(false);
+        FillColorPalette();
 
         faceObject.GenerateRandomAvatar();
+    }
+
+    private void Update()
+    {
+        // Manage color palette.
+        switch(selectedAssetType)
+        {
+            case AssetType.HeadShape:
+            case AssetType.Ears:
+            case AssetType.Nose:
+            case AssetType.FaceTexture:
+                {
+                    skinColorPalette.gameObject.SetActive(true);
+                    defaultColorPalette.gameObject.SetActive(false);
+                    break;
+                }
+            default:
+                {
+                    defaultColorPalette.gameObject.SetActive(true);
+                    skinColorPalette.gameObject.SetActive(false);
+                    break;
+                }
+        }
     }
 
     private void InitAssets(string directoryPath, AssetType assetType, AssetGender assetGender)
@@ -68,6 +98,11 @@ public class AvatarCreatorContext : MonoBehaviour {
 
         Object[] sprites = Resources.LoadAll(directoryPath, typeof(Sprite));
         string lastLoadedSpriteName = "";
+
+        // Add empty asset in order to delete the already selected one.
+        if(assetType == AssetType.Hair || assetType == AssetType.Eyebrows || assetType == AssetType.Glasses
+            || assetType == AssetType.FaceTexture || assetType == AssetType.Moustache || assetType == AssetType.Beard)
+            assets.Add(assetFactory.CreateAsset(assetType, assetGender, ""));
 
         foreach(Sprite sprite in sprites)
         {
@@ -164,10 +199,8 @@ public class AvatarCreatorContext : MonoBehaviour {
         faceObject.Unserialize(data);
     }
 
-    public static void UpdateColorPalette()
+    public static void FillColorPalette()
     {
-        Transform colorPalette = GameObject.Find("colorpalette").transform;
-
         // 19 x 9
         List<string> defaultPaletteColors = new List<string>()
         {
@@ -182,13 +215,30 @@ public class AvatarCreatorContext : MonoBehaviour {
             "#b71c1c", "#880e4f", "#4a148c", "#311b92", "#1a237e", "#0d47a1", "#01579b", "#006064", "#1b5e20", "#33691e", "#827717", "#f57f17", "#ff6f00", "#e65100", "#bf360c", "#3e2723", "#212121", "#263238"
         };
 
+        // 12 x 3
+        List<string> skinPaletteColors = new List<string>()
+        {
+            "#fff5ec", "#fee7d5", "#ffe9c9", "#fff4d8", "#fbedc6", "#fed597", "#fcdeba", "#f7d4c1", "#efc394", "#f2b596", "#f7b295", "#e6c8a6",
+            "#f5cead", "#ebb996", "#f0a96b", "#fec484", "#f4b46c", "#d09752", "#c79769", "#c3885c", "#b57b55", "#9b613c", "#c47a55", "#ac8b6a",
+            "#b38466", "#8a5f4c", "#b46032", "#e2804f", "#a0572a", "#8e5422", "#5e2508", "#604325", "#6c4639", "#2d1c12", "#452a21", "#352e28"
+        };
+
         foreach (string hex in defaultPaletteColors)
         {
             Color tempColor;
             ColorUtility.TryParseHtmlString(hex, out tempColor);
             GameObject btn = Instantiate(Resources.Load<GameObject>("color_palette_button"));
             btn.GetComponent<Image>().color = tempColor;
-            btn.transform.SetParent(colorPalette, false);
+            btn.transform.SetParent(defaultColorPalette, false);
+        }
+
+        foreach (string hex in skinPaletteColors)
+        {
+            Color tempColor;
+            ColorUtility.TryParseHtmlString(hex, out tempColor);
+            GameObject btn = Instantiate(Resources.Load<GameObject>("color_palette_button"));
+            btn.GetComponent<Image>().color = tempColor;
+            btn.transform.SetParent(skinColorPalette, false);
         }
     }
 }
