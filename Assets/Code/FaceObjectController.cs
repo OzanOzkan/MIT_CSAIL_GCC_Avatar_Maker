@@ -12,20 +12,22 @@ public class FaceObjectController : MonoBehaviour
 
     private void Awake()
     {
+        Transform mask = gameObject.transform.Find("fo_mask");
         // GameObject mappings.
         m_transforms = new Dictionary<AssetType, Transform>();
-        m_transforms.Add(AssetType.HeadShape, gameObject.transform.Find("fo_faceshape"));
-        m_transforms.Add(AssetType.Ears, gameObject.transform.Find("fo_ears"));
-        m_transforms.Add(AssetType.Hair, gameObject.transform);
-        m_transforms.Add(AssetType.Eyes, gameObject.transform.Find("fo_eyes"));
-        m_transforms.Add(AssetType.Eyebrows, gameObject.transform.Find("fo_eyebrows"));
-        m_transforms.Add(AssetType.Glasses, gameObject.transform.Find("fo_glasses"));
-        m_transforms.Add(AssetType.FaceTexture, gameObject.transform.Find("fo_facedetail"));
-        m_transforms.Add(AssetType.Nose, gameObject.transform.Find("fo_nose"));
-        m_transforms.Add(AssetType.Moustache, gameObject.transform.Find("fo_moustache"));
+        m_transforms.Add(AssetType.HeadShape, mask.Find("fo_faceshape"));
+        m_transforms.Add(AssetType.Ears, mask.Find("fo_ears"));
+        m_transforms.Add(AssetType.Hair, mask);
+        m_transforms.Add(AssetType.Eyes, mask.Find("fo_eyes"));
+        m_transforms.Add(AssetType.Eyebrows, mask.Find("fo_eyebrows"));
+        m_transforms.Add(AssetType.Glasses, mask.Find("fo_glasses"));
+        m_transforms.Add(AssetType.FaceTexture, mask.Find("fo_facedetail"));
+        m_transforms.Add(AssetType.Nose, mask.Find("fo_nose"));
+        m_transforms.Add(AssetType.Moustache, mask.Find("fo_moustache"));
         m_transforms.Add(AssetType.Beard, gameObject.transform.Find("fo_beard"));
-        m_transforms.Add(AssetType.Mouth, gameObject.transform.Find("fo_mouth"));
+        m_transforms.Add(AssetType.Mouth, mask.Find("fo_mouth"));
         m_transforms.Add(AssetType.Body, gameObject.transform.Find("fo_body"));
+        m_transforms.Add(AssetType.SpecialBody, gameObject.transform.Find("fo_specialbody"));
     }
 
     private void Update()
@@ -89,12 +91,6 @@ public class FaceObjectController : MonoBehaviour
 
         Transform currentTransform = m_transforms[asset.GetAssetType()];
 
-        if (isUserAction)
-        {
-            //if (CheckPreviousAssetAndRemove(currentTransform, asset.GetSprites()[SpritePart.Default][0]))
-            //    return;
-        }
-
         if (asset.GetAssetType() == AssetType.Hair)
         {
             Transform hairFront = currentTransform.Find("fo_hair_front");
@@ -138,21 +134,31 @@ public class FaceObjectController : MonoBehaviour
         {
             currentTransform.Find("L1").GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Back][(int)AvatarCreatorContext.currentRealismLevel];
             currentTransform.Find("L2").GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Default][(int)AvatarCreatorContext.currentRealismLevel];
-
-            //if (currentTransform.Find("L1").GetComponent<Image>().sprite == null)
-            //    currentTransform.Find("L1").gameObject.SetActive(false);
-            //else
-            //    currentTransform.Find("L1").gameObject.SetActive(true);
-
-            //if (currentTransform.Find("L2").GetComponent<Image>().sprite == null)
-            //    currentTransform.Find("L2").gameObject.SetActive(false);
-            //else
-            //    currentTransform.Find("L2").gameObject.SetActive(true);
         }
         else if(asset.GetAssetType() == AssetType.Body)
         {
             currentTransform.Find("L1").GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Back][(int)AvatarCreatorContext.currentRealismLevel];
             currentTransform.Find("L2").GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Default][(int)AvatarCreatorContext.currentRealismLevel];
+
+            m_transforms[AssetType.Body].gameObject.SetActive(true);
+            m_transforms[AssetType.SpecialBody].gameObject.SetActive(false);
+            gameObject.transform.Find("fo_mask").gameObject.GetComponent<Mask>().enabled = false;
+        }
+        else if(asset.GetAssetType() == AssetType.SpecialBody)
+        {
+            if (asset.GetSprites().ContainsKey(SpritePart.Front))
+                currentTransform.Find("L1").GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Front][(int)AvatarCreatorContext.currentRealismLevel];
+            else
+                currentTransform.Find("L1").GetComponent<Image>().sprite = null;
+
+            if (asset.GetSprites().ContainsKey(SpritePart.Back))
+                currentTransform.Find("L2").GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Back][(int)AvatarCreatorContext.currentRealismLevel];
+            else
+                currentTransform.Find("L2").GetComponent<Image>().sprite = null;
+
+            m_transforms[AssetType.Body].gameObject.SetActive(false);
+            m_transforms[AssetType.SpecialBody].gameObject.SetActive(true);
+            gameObject.transform.Find("fo_mask").gameObject.GetComponent<Mask>().enabled = true;
         }
         else
         {
@@ -193,7 +199,7 @@ public class FaceObjectController : MonoBehaviour
         float maxVertical = 9f;
         float maxHorizontal = 5f;
 
-        float moveOffset = 0.5f;
+        float moveOffset = 0.2f;
         Vector3 tempPos = currentObject.localPosition;
 
         if(modifyFlag == AssetModifyFlag.MoveVertical)
@@ -230,14 +236,9 @@ public class FaceObjectController : MonoBehaviour
     {
         Transform currentObject = m_transforms[AvatarCreatorContext.selectedAssetType];
 
-        // get current size
-        // calculate new size
-        // check if it is bigger or smaller than %10 of original.
-        // if not, do it.
-
         Vector3 maxScale = new Vector3(1.2f, 1.2f, 0);
         Vector3 minScale = new Vector3(0.8f, 0.8f, 0);
-        float resizeOffset = 0.05f;
+        float resizeOffset = 0.02f;
 
         if(modifyFlag == AssetModifyFlag.Resize)
         {
@@ -285,7 +286,7 @@ public class FaceObjectController : MonoBehaviour
     {
         Transform currentObject = m_transforms[AvatarCreatorContext.selectedAssetType];
 
-        float distanceOffset = 1f;
+        float distanceOffset = 0.3f;
 
         Transform left = currentObject.transform.GetChild(0);
         Transform right = currentObject.transform.GetChild(1);
@@ -307,7 +308,7 @@ public class FaceObjectController : MonoBehaviour
         Transform currentObject = m_transforms[AvatarCreatorContext.selectedAssetType];
 
       //  float maxAngle = 30f;
-        float rotateOffset = 1f;
+        float rotateOffset = 0.3f;
 
         Transform left = currentObject.transform.GetChild(0);
         Transform right = currentObject.transform.GetChild(1);
@@ -339,6 +340,8 @@ public class FaceObjectController : MonoBehaviour
         switch (AvatarCreatorContext.selectedAssetType)
         {
             case AssetType.HeadShape:
+            case AssetType.Ears:
+            case AssetType.Nose:
                 {
                     m_transforms[AssetType.HeadShape].GetComponent<Image>().color = color;
 
@@ -346,6 +349,10 @@ public class FaceObjectController : MonoBehaviour
                     m_transforms[AssetType.Ears].transform.Find("fo_ear_right").GetComponent<Image>().color = color;
                
                     m_transforms[AssetType.Nose].GetComponent<Image>().color = color;
+
+                    m_transforms[AssetType.Body].transform.Find("L2").GetComponent<Image>().color = color;
+
+                    m_transforms[AssetType.SpecialBody].transform.Find("L1").GetComponent<Image>().color = color;
                     break;
                 }
             case AssetType.Mouth:

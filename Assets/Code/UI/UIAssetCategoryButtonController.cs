@@ -42,6 +42,11 @@ public class UIAssetCategoryButtonController : MonoBehaviour
             FillScrollList(AssetType.Ears);
             FillScrollList(AssetType.Nose);
         }
+        else if(m_assetType == AssetType.Body)
+        {
+            FillScrollList(AssetType.Body);
+            FillScrollList(AssetType.SpecialBody);
+        }
         else
         {
             FillScrollList(m_assetType);

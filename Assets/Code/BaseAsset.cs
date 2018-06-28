@@ -33,6 +33,7 @@ public enum AssetType
     Body,
     BackgroundTexture,
     FGGraphic,
+    SpecialBody,
     None
 }
 
@@ -178,6 +179,8 @@ public class CBaseAssetFactory
                 return new CMouth(gender, assetPath);
             case AssetType.Body:
                 return new CBody(gender, assetPath);
+            case AssetType.SpecialBody:
+                return new CSpecialBody(gender, assetPath);
         }
 
         return null;
@@ -445,6 +448,53 @@ public class CBody : CBaseAsset
         m_sprites.Add(SpritePart.Default, colorizedLayers);
 
         Debug.Log("CBody:LoadSpriteOverride: " + GetResourcePath(assetPath));
+    }
+}
+
+public class CSpecialBody : CBaseAsset
+{
+    public CSpecialBody(AssetGender gender, string assetPath)
+    : base(gender, AssetType.SpecialBody
+        , AssetModifyFlag.Resize | AssetModifyFlag.StretchHorizontal | AssetModifyFlag.StretchVertical
+        , assetPath, true)
+    { }
+
+    protected override void LoadSpriteOverride(string assetPath)
+    {
+        Sprite spriteToLoad;
+
+        // Layered?
+        if (spriteToLoad = Resources.Load<Sprite>(assetPath + "_A_L1"))
+        {
+            List<Sprite> backLayers = new List<Sprite>()
+            {
+                Resources.Load<Sprite>(assetPath + "_A_L1"),
+                Resources.Load<Sprite>(assetPath + "_B_L1"),
+                Resources.Load<Sprite>(assetPath + "_C_L1")
+            };
+
+            m_sprites.Add(SpritePart.Back, backLayers);
+
+            List<Sprite> frontLayers = new List<Sprite>()
+            {
+                Resources.Load<Sprite>(assetPath + "_A_L2"),
+                Resources.Load<Sprite>(assetPath + "_B_L2"),
+                Resources.Load<Sprite>(assetPath + "_C_L2")
+            };
+
+            m_sprites.Add(SpritePart.Front, frontLayers);
+        }
+        else
+        {
+            List<Sprite> spriteListToLoad = new List<Sprite>()
+            {
+                Resources.Load<Sprite>(assetPath + "_A"),
+                Resources.Load<Sprite>(assetPath + "_B"),
+                Resources.Load<Sprite>(assetPath + "_C"),
+            };
+
+            m_sprites.Add(SpritePart.Front, spriteListToLoad);
+        }
     }
 }
 
