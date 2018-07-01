@@ -33,10 +33,7 @@ public class UILoadSaveButtonsController : MonoBehaviour {
         else if (m_buttonType == ButtonType.LoadButton)
             AvatarCreatorContext.fileTransferManager.UploadFile();
         else if (m_buttonType == ButtonType.SaveButton)
-        {
-            string savedata = AvatarCreatorContext.logManager.DumpLogs();
-            AvatarCreatorContext.fileTransferManager.DownloadSaveFile(savedata);
-        }
+            AvatarCreatorContext.SaveAvatarToFile();
 
         AvatarCreatorContext.logManager.LogAction("UIButtonClick", m_buttonType.ToString());
     }

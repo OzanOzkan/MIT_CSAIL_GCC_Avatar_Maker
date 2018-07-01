@@ -69,9 +69,9 @@ public class FaceObjectController : MonoBehaviour
         if (root.childCount == 0)
         {
             if (root.GetComponent<Image>().sprite == null)
-                root.gameObject.SetActive(false);
+                root.GetComponent<Image>().enabled = false;
             else
-                root.gameObject.SetActive(true);
+                root.GetComponent<Image>().enabled = true;
 
             return;
         }
@@ -89,6 +89,9 @@ public class FaceObjectController : MonoBehaviour
         if (asset == null)
             return;
 
+        if (asset.GetAssetType() == AssetType.None)
+            return;
+
         Transform currentTransform = m_transforms[asset.GetAssetType()];
 
         if (asset.GetAssetType() == AssetType.Hair)
@@ -96,7 +99,8 @@ public class FaceObjectController : MonoBehaviour
             Transform hairFront = currentTransform.Find("fo_hair_front");
             Transform hairBack = currentTransform.Find("fo_hair_back");
 
-            hairFront.GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Front][(int)AvatarCreatorContext.currentRealismLevel];
+            if (asset.GetSprites().ContainsKey(SpritePart.Front))
+                hairFront.GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Front][(int)AvatarCreatorContext.currentRealismLevel];
 
             if (asset.GetSprites().ContainsKey(SpritePart.Back))
             {
@@ -122,23 +126,23 @@ public class FaceObjectController : MonoBehaviour
             Transform eye_left = currentTransform.Find("fo_eye_left");
             Transform eye_right = currentTransform.Find("fo_eye_right");
 
-            eye_left.Find("L1").GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Back][(int)AvatarCreatorContext.currentRealismLevel];
-            eye_left.Find("L2").GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Default][(int)AvatarCreatorContext.currentRealismLevel];
-            eye_left.Find("L3").GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Front][(int)AvatarCreatorContext.currentRealismLevel];
+            eye_left.Find("fo_eye_left_L1").GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Back][(int)AvatarCreatorContext.currentRealismLevel];
+            eye_left.Find("fo_eye_left_L2").GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Default][(int)AvatarCreatorContext.currentRealismLevel];
+            eye_left.Find("fo_eye_left_L3").GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Front][(int)AvatarCreatorContext.currentRealismLevel];
 
-            eye_right.Find("L1").GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Back][(int)AvatarCreatorContext.currentRealismLevel];
-            eye_right.Find("L2").GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Default][(int)AvatarCreatorContext.currentRealismLevel];
-            eye_right.Find("L3").GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Front][(int)AvatarCreatorContext.currentRealismLevel];
+            eye_right.Find("fo_eye_right_L1").GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Back][(int)AvatarCreatorContext.currentRealismLevel];
+            eye_right.Find("fo_eye_right_L2").GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Default][(int)AvatarCreatorContext.currentRealismLevel];
+            eye_right.Find("fo_eye_right_L3").GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Front][(int)AvatarCreatorContext.currentRealismLevel];
         }
         else if (asset.GetAssetType() == AssetType.Mouth)
         {
-            currentTransform.Find("L1").GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Back][(int)AvatarCreatorContext.currentRealismLevel];
-            currentTransform.Find("L2").GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Default][(int)AvatarCreatorContext.currentRealismLevel];
+            currentTransform.Find("fo_mouth_L1").GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Back][(int)AvatarCreatorContext.currentRealismLevel];
+            currentTransform.Find("fo_mouth_L2").GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Default][(int)AvatarCreatorContext.currentRealismLevel];
         }
         else if(asset.GetAssetType() == AssetType.Body)
         {
-            currentTransform.Find("L1").GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Back][(int)AvatarCreatorContext.currentRealismLevel];
-            currentTransform.Find("L2").GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Default][(int)AvatarCreatorContext.currentRealismLevel];
+            currentTransform.Find("fo_body_L1").GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Back][(int)AvatarCreatorContext.currentRealismLevel];
+            currentTransform.Find("fo_body_L2").GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Default][(int)AvatarCreatorContext.currentRealismLevel];
 
             m_transforms[AssetType.Body].gameObject.SetActive(true);
             m_transforms[AssetType.SpecialBody].gameObject.SetActive(false);
@@ -147,14 +151,14 @@ public class FaceObjectController : MonoBehaviour
         else if(asset.GetAssetType() == AssetType.SpecialBody)
         {
             if (asset.GetSprites().ContainsKey(SpritePart.Front))
-                currentTransform.Find("L1").GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Front][(int)AvatarCreatorContext.currentRealismLevel];
+                currentTransform.Find("fo_specialbody_L1").GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Front][(int)AvatarCreatorContext.currentRealismLevel];
             else
-                currentTransform.Find("L1").GetComponent<Image>().sprite = null;
+                currentTransform.Find("fo_specialbody_L1").GetComponent<Image>().sprite = null;
 
             if (asset.GetSprites().ContainsKey(SpritePart.Back))
-                currentTransform.Find("L2").GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Back][(int)AvatarCreatorContext.currentRealismLevel];
+                currentTransform.Find("fo_specialbody_L2").GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Back][(int)AvatarCreatorContext.currentRealismLevel];
             else
-                currentTransform.Find("L2").GetComponent<Image>().sprite = null;
+                currentTransform.Find("fo_specialbody_L2").GetComponent<Image>().sprite = null;
 
             m_transforms[AssetType.Body].gameObject.SetActive(false);
             m_transforms[AssetType.SpecialBody].gameObject.SetActive(true);
@@ -333,9 +337,11 @@ public class FaceObjectController : MonoBehaviour
         }
     }
 
-    public void ChangeAssetColor(Color color)
+    public void ChangeAssetColor(Color color, Transform currentObject=null)
     {
-        Transform currentObject = m_transforms[AvatarCreatorContext.selectedAssetType];
+        if (currentObject == null)
+            currentObject = m_transforms[AvatarCreatorContext.selectedAssetType];
+
 
         switch (AvatarCreatorContext.selectedAssetType)
         {
@@ -350,14 +356,14 @@ public class FaceObjectController : MonoBehaviour
                
                     m_transforms[AssetType.Nose].GetComponent<Image>().color = color;
 
-                    m_transforms[AssetType.Body].transform.Find("L2").GetComponent<Image>().color = color;
+                    m_transforms[AssetType.Body].transform.Find("fo_body_L2").GetComponent<Image>().color = color;
 
-                    m_transforms[AssetType.SpecialBody].transform.Find("L1").GetComponent<Image>().color = color;
+                    m_transforms[AssetType.SpecialBody].transform.Find("fo_specialbody_L1").GetComponent<Image>().color = color;
                     break;
                 }
             case AssetType.Mouth:
                 {
-                    currentObject.Find("L1").GetComponent<Image>().color = color;
+                    currentObject.Find("fo_mouth_L1").GetComponent<Image>().color = color;
                     break;
                 }
             case AssetType.Hair:
@@ -375,8 +381,8 @@ public class FaceObjectController : MonoBehaviour
                 }
             case AssetType.Eyes:
                 {
-                    currentObject.Find("fo_eye_left").Find("L2").GetComponent<Image>().color = color;
-                    currentObject.Find("fo_eye_right").Find("L2").GetComponent<Image>().color = color;
+                    currentObject.Find("fo_eye_left").Find("fo_eye_left_L2").GetComponent<Image>().color = color;
+                    currentObject.Find("fo_eye_right").Find("fo_eye_right_L2").GetComponent<Image>().color = color;
                     break;
                 }
             case AssetType.Eyebrows:
@@ -412,37 +418,65 @@ public class FaceObjectController : MonoBehaviour
         StringBuilder content = new StringBuilder();
         content.Append("<FaceObject>\n");
 
-        foreach (KeyValuePair<AssetType, Transform> fObject in m_transforms)
-        {
-            if (fObject.Value.childCount > 0)
-            {
-                for (int i = 0; i < fObject.Value.childCount; ++i)
-                {
-                    content.Append(PrepareSerializeLine(fObject.Key, fObject.Value.GetChild(i)));
-                }
-            }
-            else
-            {
-                content.Append(PrepareSerializeLine(fObject.Key, fObject.Value));
-            }
-        }
+        content.Append(SerializeSubObjects(GameObject.Find("FaceObject").transform));
+
+        //foreach (KeyValuePair<AssetType, Transform> fObject in m_transforms)
+        //{
+        //    if (fObject.Value.childCount > 0)
+        //    {
+        //        for (int i = 0; i < fObject.Value.childCount; ++i)
+        //        {
+        //            content.Append(PrepareSerializeLine(fObject.Key, fObject.Value.GetChild(i)));
+        //        }
+        //    }
+        //    else
+        //    {
+        //        content.Append(PrepareSerializeLine(fObject.Key, fObject.Value));
+        //    }
+        //}
 
         content.Append("</FaceObject>");
 
         return content.ToString();
     }
 
-    private string PrepareSerializeLine(AssetType type, Transform transform)
+    private string SerializeSubObjects(Transform node)
+    {
+        string returnVal = "";
+
+        if (node.childCount > 0)
+        {
+            for (int i = 0; i < node.childCount; ++i)
+            {
+                 returnVal += SerializeSubObjects(node.GetChild(i));
+            }
+        }
+        else
+        {
+            returnVal += PrepareSerializeLine(node);
+        }
+
+        return returnVal;
+    }
+
+    private string PrepareSerializeLine(Transform transform)
     {
         string returnStr = "<Object ";
         returnStr += "name=\"" + transform.name + "\" ";
 
-        if (transform.GetComponent<Image>().sprite != null)
+        if (transform.GetComponent<Image>() != null && transform.GetComponent<Image>().sprite != null)
             returnStr += "asset=\"" + transform.GetComponent<Image>().sprite.name + "\" ";
         else
             returnStr += "asset=\"\" ";
 
-        returnStr += "type=\"" + type + "\" ";
+        //returnStr += "type=\"" + type + "\" ";
+        returnStr += "posx=\"" + transform.position.x + "\" posy=\"" + transform.position.y + "\" posz=\"" + transform.position.z + "\" ";
+        returnStr += "rotx=\"" + transform.rotation.x + "\" roty=\"" + transform.rotation.y + "\" rotz=\"" + transform.rotation.z + "\" rotw=\"" + transform.rotation.w + "\" ";
+        returnStr += "scalex=\"" + transform.localScale.x + "\" scaley=\"" + transform.localScale.y + "\" scalez=\"" + transform.localScale.z + "\" ";
+
+        if(transform.GetComponent<Image>() != null)
+            returnStr += "color=\"" + ColorUtility.ToHtmlStringRGB(transform.GetComponent<Image>().color) + "\" ";
+
         returnStr += "/>\n";
 
         return returnStr;
@@ -453,8 +487,13 @@ public class FaceObjectController : MonoBehaviour
         Debug.Log("FaceObjectController:Unserialize()\n" + data);
 
         AssetType assetType = AssetType.None;
+        string objectName = "";
         string assetName = "";
-
+        Vector3 position = new Vector3();
+        Quaternion rotation = new Quaternion();
+        Vector3 scale = new Vector3();
+        Color color = new Color();
+        
         XmlDocument doc = new XmlDocument();
         doc.LoadXml(data);
 
@@ -463,18 +502,109 @@ public class FaceObjectController : MonoBehaviour
         {
             foreach (XmlAttribute attr in node.Attributes)
             {
-                if (attr.Name == "asset")
-                    assetName = attr.Value;
-                else if (attr.Name == "type")
-                    assetType = (AssetType)System.Enum.Parse(typeof(AssetType), attr.Value);
+                switch (attr.Name)
+                {
+                    case "name":
+                        {
+                            objectName = attr.Value;
+                            break;
+                        }
+                    case "asset":
+                        {
+                            assetName = attr.Value;
+                            break;
+                        }
+                    case "type":
+                        {
+                            assetType = (AssetType)System.Enum.Parse(typeof(AssetType), attr.Value);
+                            break;
+                        }
+                    case "posx":
+                        {
+                            position.x = float.Parse(attr.Value);
+                            break;
+                        }
+                    case "posy":
+                        {
+                            position.y = float.Parse(attr.Value);
+                            break;
+                        }
+                    case "posz":
+                        {
+                            position.z = float.Parse(attr.Value);
+                            break;
+                        }
+                    case "rotx":
+                        {
+                            rotation.x = float.Parse(attr.Value);
+                            break;
+                        }
+                    case "roty":
+                        {
+                            rotation.y = float.Parse(attr.Value);
+                            break;
+                        }
+                    case "rotz":
+                        {
+                            rotation.z = float.Parse(attr.Value);
+                            break;
+                        }
+                    case "rotw":
+                        {
+                            rotation.w = float.Parse(attr.Value);
+                            break;
+                        }
+                    case "scalex":
+                        {
+                            scale.x = float.Parse(attr.Value);
+                            break;
+                        }
+                    case "scaley":
+                        {
+                            scale.y = float.Parse(attr.Value);
+                            break;
+                        }
+                    case "scalez":
+                        {
+                            scale.z = float.Parse(attr.Value);
+                            break;
+                        }
+                    case "color":
+                        {
+                            ColorUtility.TryParseHtmlString("#"+attr.Value, out color);
+                            break;
+                        }
+                }
             }
 
-            CBaseAsset asset = AvatarCreatorContext.FindAssetByName(assetType, assetName);
+            Debug.Log(objectName + " " + assetName);
+
+            if (assetName == "")
+                continue;
+
+            CBaseAsset asset = AvatarCreatorContext.FindAssetByName(assetName);
 
             if (asset == null)
                 asset = new CBaseAsset(AssetGender.NoGender, assetType, 0, "");
 
+            //AvatarCreatorContext.selectedAssetType = asset.GetAssetType();
+
+            GameObject gObject = GameObject.Find(objectName);
+            if (gObject)
+            {
+                gObject.transform.position = position;
+                gObject.transform.rotation = rotation;
+                gObject.transform.localScale = scale;
+
+                if (gObject.GetComponent<Image>() != null)
+                    gObject.GetComponent<Image>().color = color;
+            }
+
             SetFaceObjectPart(asset, false);
+
+            //Transform selectedAsset = m_transforms[assetType];
+
+           // ChangeAssetColor(color, gameObject.transform);
         }
     }
 }

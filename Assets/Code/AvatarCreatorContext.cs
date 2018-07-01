@@ -52,18 +52,17 @@ public class AvatarCreatorContext : MonoBehaviour {
         InitAssets("FaceObject/fo_body/", AssetType.Body, AssetGender.NoGender);
         InitAssets("FaceObject/fo_specialbody/", AssetType.SpecialBody, AssetGender.Female);
 
-        //InitAssets("Assets/Resources/FaceObject/fo_mouth/male/", AssetType.Mouth, AssetGender.Male);          TODO
-        //InitAssets("Assets/Resources/FaceObject/fo_mouth/female/", AssetType.Mouth, AssetGender.Female);      TODO
-
         // Set the default selected category as Body.
         GameObject.Find("btn_body").GetComponent<UIAssetCategoryButtonController>().OnButtonClick();
 
+        // Color palette management.
         defaultColorPalette = GameObject.Find("colorpalette_default").transform;
         defaultColorPalette.gameObject.SetActive(false);
         skinColorPalette = GameObject.Find("colorpalette_skin").transform;
         skinColorPalette.gameObject.SetActive(false);
         FillColorPalette();
 
+        // Random avatar generation on the first run.
         faceObject.GenerateRandomAvatar();
     }
 
@@ -115,20 +114,6 @@ public class AvatarCreatorContext : MonoBehaviour {
             lastLoadedSpriteName = currentSpriteName;
         }
 
-        // Old implementation
-        //foreach(Sprite sprite in sprites)
-        //{
-        //    string spritename = sprite.name + ".png";
-
-        //    if(spritename.Contains("_L2.png"))
-
-
-        //    if (spritename.Contains("b.png")) // TODO: This check is not good... Figure out later.
-        //        continue;
-
-        //    assets.Add(assetFactory.CreateAsset(assetType, assetGender, directoryPath + spritename));
-        //}
-
         if(m_assets.ContainsKey(assetType))
             m_assets[assetType].AddRange(assets);
         else
@@ -160,13 +145,16 @@ public class AvatarCreatorContext : MonoBehaviour {
 
     public static CBaseAsset FindAssetByName(string name)
     {
-        foreach(List<CBaseAsset> currentAssetlist in m_assets.Values)
+        if (name == "")
+            return null;
+
+        foreach (List<CBaseAsset> currentAssetlist in m_assets.Values)
         {
             foreach (CBaseAsset currentAsset in currentAssetlist)
             {
                 foreach (KeyValuePair<SpritePart, List<Sprite>> sprites in currentAsset.GetSprites())
                 {
-                    if (sprites.Value[0].name == name)
+                    if (sprites.Value[0] != null && sprites.Value[0].name == name)
                         return currentAsset;
                 }
             }
@@ -177,11 +165,14 @@ public class AvatarCreatorContext : MonoBehaviour {
 
     public static CBaseAsset FindAssetByName(AssetType type, string name)
     {
+        if (name == "")
+            return null;
+
         foreach (CBaseAsset currentAsset in m_assets[type])
         {
             foreach (KeyValuePair<SpritePart, List<Sprite>> sprites in currentAsset.GetSprites())
             {
-                if (sprites.Value[0].name == name)
+                if (sprites.Value[0] != null && sprites.Value[0].name == name)
                     return currentAsset;
             }
         }
@@ -191,13 +182,67 @@ public class AvatarCreatorContext : MonoBehaviour {
 
     public static void SaveAvatarToFile()
     {
-        Debug.Log(faceObject.Serialize());
+        string savedata = logManager.DumpLogs();
+        fileTransferManager.DownloadSaveFile(savedata);
+    }
+
+    public static string SerializeUIFields()
+    {
+        StringBuilder returnString = new StringBuilder();
+        returnString.Append("<AvatarInfo>\n");
+        returnString.Append("<Info name=\"" + GameObject.Find("inputfield_avatarname").GetComponent<InputField>().text + "\"/>\n");
+        returnString.Append("<Info dob=\"" + GameObject.Find("dropdown_dob").GetComponent<Dropdown>().value.ToString() + "\"/>\n");
+        returnString.Append("<Info gender=\"" + GameObject.Find("dropdown_gender").GetComponent<Dropdown>().value.ToString() + "\"/>\n");
+        returnString.Append("<Info bio=\"" + GameObject.Find("inputfield_info").GetComponent<InputField>().text + "\"/>\n");
+        returnString.Append("</AvatarInfo>\n");
+
+        return returnString.ToString();
+    }
+
+    public static void UnserializeUIFields(string data)
+    {
+        Debug.Log("AvatarCreatorContext.UnserializeUIFields()");
+
+        XmlDocument doc = new XmlDocument();
+        doc.LoadXml(data);
+
+        XmlNode root = doc.DocumentElement.SelectSingleNode("/SaveFile/AvatarInfo");
+        foreach (XmlNode node in root.ChildNodes)
+        {
+            foreach (XmlAttribute attr in node.Attributes)
+            {
+                switch (attr.Name)
+                {
+                    case "name":
+                        {
+                            GameObject.Find("inputfield_avatarname").GetComponent<InputField>().text = attr.Value;
+                            break;
+                        }
+                    case "dob":
+                        {
+                            GameObject.Find("dropdown_dob").GetComponent<Dropdown>().value = System.Convert.ToInt32(attr.Value);
+                            break;
+                        }
+                    case "gender":
+                        {
+                            GameObject.Find("dropdown_gender").GetComponent<Dropdown>().value = System.Convert.ToInt32(attr.Value);
+                            break;
+                        }
+                    case "bio":
+                        {
+                            GameObject.Find("inputfield_info").GetComponent<InputField>().text = attr.Value;
+                            break;
+                        }
+                }
+            }
+        }
     }
 
     // FileTransferManager calls this method.
     public static void LoadAvatarFromFile(string data)
     {
         faceObject.Unserialize(data);
+        UnserializeUIFields(data);
     }
 
     public static void FillColorPalette()

@@ -30,7 +30,11 @@ public class LogManager : MonoBehaviour
 
         m_actionLogs.Append("</Actions>\n");
 
-        string data = "<SaveFile>\n" + AvatarCreatorContext.faceObject.Serialize() + "\n" + m_actionLogs.ToString() + "</SaveFile>";
+        string data = "<SaveFile>\n" 
+            + AvatarCreatorContext.SerializeUIFields()
+            + AvatarCreatorContext.faceObject.Serialize() + "\n" 
+            + m_actionLogs.ToString() 
+            + "</SaveFile>";
 
         StartCoroutine(PHPRequest(data));
 
@@ -44,7 +48,7 @@ public class LogManager : MonoBehaviour
         WWWForm form = new WWWForm();
         form.AddField("filename", AvatarCreatorContext.sessionguid.ToString());
         form.AddField("data", data);
-        WWW www = new WWW("http://localhost:8080/savetelemetry.php", form);
+        WWW www = new WWW("http://127.0.0.1/projects/avatarmaker/savetelemetry.php", form);
 
         yield return www;
         if (www.error != null)
