@@ -34,6 +34,7 @@ public enum AssetType
     BackgroundTexture,
     FGGraphic,
     SpecialBody,
+    Ghutra,
     None
 }
 
@@ -90,7 +91,6 @@ public class CBaseAsset
     #region Shared Methods
     protected void LoadSprite(string assetPath, bool isOverride)
     {
-        // m_sprites = new Dictionary<SpritePart, Sprite>();
         m_sprites = new Dictionary<SpritePart, List<Sprite>>();
 
         if (!isOverride)
@@ -116,22 +116,6 @@ public class CBaseAsset
             }
 
             m_sprites.Add(SpritePart.Default, spriteListToLoad);
-
-            // Old implementation
-            //if (assetPath.Length > 0)
-            //{
-            //    m_sprites.Add(SpritePart.Default, Resources.Load<Sprite>(GetResourcePath(assetPath)));
-            //    Debug.Log("CBaseAsset:LoadSprite: " + GetResourcePath(assetPath));
-
-            //    return;
-            //}
-
-            //// For the dummy CBaseAsset creation.
-            //m_sprites.Add(SpritePart.Default, null);
-            //m_sprites.Add(SpritePart.Front, null);
-            //m_sprites.Add(SpritePart.Back, null);
-            //m_sprites.Add(SpritePart.Left, null);
-            //m_sprites.Add(SpritePart.Right, null);
         }
         else
         {
@@ -181,6 +165,8 @@ public class CBaseAssetFactory
                 return new CBody(gender, assetPath);
             case AssetType.SpecialBody:
                 return new CSpecialBody(gender, assetPath);
+            case AssetType.Ghutra:
+                return new CGhutra(gender, assetPath);
         }
 
         return null;
@@ -392,7 +378,7 @@ public class CMouth : CBaseAsset
 {
     public CMouth(AssetGender gender, string assetPath)
         : base(gender ,AssetType.Mouth
-            , AssetModifyFlag.MoveHorizontal | AssetModifyFlag.Resize | AssetModifyFlag.StretchHorizontal | AssetModifyFlag.StretchVertical
+            , AssetModifyFlag.MoveHorizontal | AssetModifyFlag.MoveVertical | AssetModifyFlag.Resize | AssetModifyFlag.StretchHorizontal | AssetModifyFlag.StretchVertical
             , assetPath, true)
     { }
 
@@ -498,4 +484,28 @@ public class CSpecialBody : CBaseAsset
     }
 }
 
-// TODO: BG Texture, FG Graphic
+public class CGhutra : CBaseAsset
+{
+    public CGhutra(AssetGender gender, string assetPath)
+    : base(gender, AssetType.Ghutra
+        , AssetModifyFlag.MoveVertical | AssetModifyFlag.Resize | AssetModifyFlag.StretchHorizontal | AssetModifyFlag.StretchVertical
+        , assetPath, true)
+    { }
+
+    protected override void LoadSpriteOverride(string assetPath)
+    {
+        List<Sprite> backLayers = new List<Sprite>()
+            {
+                Resources.Load<Sprite>(assetPath + "_L1")
+            };
+
+        m_sprites.Add(SpritePart.Back, backLayers);
+
+        List<Sprite> frontLayers = new List<Sprite>()
+            {
+                Resources.Load<Sprite>(assetPath + "_L2")
+            };
+
+        m_sprites.Add(SpritePart.Front, frontLayers);
+    }
+}

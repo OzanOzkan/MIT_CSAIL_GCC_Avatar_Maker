@@ -7,6 +7,12 @@ using UnityEngine.UI;
 using System.Xml;
 using System.Text;
 
+public enum ColorPalette
+{
+    Default = 0,
+    Skin
+}
+
 public class AvatarCreatorContext : MonoBehaviour {
 
     public static AssetType selectedAssetType { get; set; }
@@ -51,6 +57,7 @@ public class AvatarCreatorContext : MonoBehaviour {
         InitAssets("FaceObject/fo_mouth/", AssetType.Mouth, AssetGender.NoGender);
         InitAssets("FaceObject/fo_body/", AssetType.Body, AssetGender.NoGender);
         InitAssets("FaceObject/fo_specialbody/", AssetType.SpecialBody, AssetGender.Female);
+        InitAssets("FaceObject/fo_ghutra/", AssetType.Ghutra, AssetGender.Male);
 
         // Set the default selected category as Body.
         GameObject.Find("btn_body").GetComponent<UIAssetCategoryButtonController>().OnButtonClick();
@@ -101,7 +108,8 @@ public class AvatarCreatorContext : MonoBehaviour {
 
         // Add empty asset in order to delete the already selected one.
         if(assetType == AssetType.Hair || assetType == AssetType.Eyebrows || assetType == AssetType.Glasses
-            || assetType == AssetType.FaceTexture || assetType == AssetType.Moustache || assetType == AssetType.Beard)
+            || assetType == AssetType.FaceTexture || assetType == AssetType.Moustache || assetType == AssetType.Beard 
+            || assetType == AssetType.SpecialBody || assetType == AssetType.Ghutra)
             assets.Add(assetFactory.CreateAsset(assetType, assetGender, ""));
 
         foreach(Sprite sprite in sprites)
@@ -286,5 +294,27 @@ public class AvatarCreatorContext : MonoBehaviour {
             btn.GetComponent<Image>().color = tempColor;
             btn.transform.SetParent(skinColorPalette, false);
         }
+    }
+
+    public static List<Color> GetPaletteColors(ColorPalette palette)
+    {
+        List<Color> returnList = new List<Color>();
+
+        if(palette == ColorPalette.Default)
+        {
+            for(int i =0; i < defaultColorPalette.childCount; ++i)
+            {
+                returnList.Add(defaultColorPalette.GetChild(i).GetComponent<Image>().color);
+            }
+        }
+        else
+        {
+            for (int i = 0; i < skinColorPalette.childCount; ++i)
+            {
+                returnList.Add(skinColorPalette.GetChild(i).GetComponent<Image>().color);
+            }
+        }
+
+        return returnList;
     }
 }

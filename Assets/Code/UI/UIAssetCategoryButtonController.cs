@@ -28,7 +28,7 @@ public class UIAssetCategoryButtonController : MonoBehaviour
         AvatarCreatorContext.selectedAssetType = m_assetType;
         Debug.Log("Asset type changed to: " + m_assetType.ToString());
 
-        AvatarCreatorContext.logManager.LogAction("UIButtonClick", m_assetType.ToString());
+        AvatarCreatorContext.logManager.LogAction("AssetSelected", m_assetType.ToString());
    
         scrollView.DestroyChildren();
 
@@ -46,6 +46,11 @@ public class UIAssetCategoryButtonController : MonoBehaviour
         {
             FillScrollList(AssetType.Body);
             FillScrollList(AssetType.SpecialBody);
+        }
+        else if (m_assetType == AssetType.Hair)
+        {
+            FillScrollList(AssetType.Hair);
+            FillScrollList(AssetType.Ghutra);
         }
         else
         {

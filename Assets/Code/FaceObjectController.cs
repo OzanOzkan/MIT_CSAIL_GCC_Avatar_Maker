@@ -9,6 +9,7 @@ using UnityEngine.UI;
 public class FaceObjectController : MonoBehaviour
 {
     public Dictionary<AssetType, Transform> m_transforms;
+    private CBaseAsset m_currentAsset;
 
     private void Awake()
     {
@@ -17,7 +18,7 @@ public class FaceObjectController : MonoBehaviour
         m_transforms = new Dictionary<AssetType, Transform>();
         m_transforms.Add(AssetType.HeadShape, mask.Find("fo_faceshape"));
         m_transforms.Add(AssetType.Ears, mask.Find("fo_ears"));
-        m_transforms.Add(AssetType.Hair, mask);
+        m_transforms.Add(AssetType.Hair, mask.Find("fo_hair_front"));
         m_transforms.Add(AssetType.Eyes, mask.Find("fo_eyes"));
         m_transforms.Add(AssetType.Eyebrows, mask.Find("fo_eyebrows"));
         m_transforms.Add(AssetType.Glasses, mask.Find("fo_glasses"));
@@ -28,12 +29,13 @@ public class FaceObjectController : MonoBehaviour
         m_transforms.Add(AssetType.Mouth, mask.Find("fo_mouth"));
         m_transforms.Add(AssetType.Body, gameObject.transform.Find("fo_body"));
         m_transforms.Add(AssetType.SpecialBody, gameObject.transform.Find("fo_specialbody"));
+        m_transforms.Add(AssetType.Ghutra, gameObject.transform.Find("fo_ghutra_front"));
     }
 
     private void Update()
     {
         // Manage visibility of empty sprites. (Empty sprites displays as white planes)
-        foreach(Transform currentTransform in m_transforms.Values)
+        foreach(Transform currentTransform in transform)
         {
             ManageSpriteVisibility(currentTransform);
         }
@@ -41,27 +43,50 @@ public class FaceObjectController : MonoBehaviour
 
     public void GenerateRandomAvatar()
     {
-        // Random face generation. TODO: Gender corrections.
-        AssetGender randomGender = (AssetGender)Random.Range(0, 2);
-
+        // Head shape
         List<CBaseAsset> tempAssets = AvatarCreatorContext.GetLoadedAssetsByType(AssetType.HeadShape);
         SetFaceObjectPart(tempAssets[Random.Range(0, tempAssets.Count)], false);
 
+        // Ears
         tempAssets = AvatarCreatorContext.GetLoadedAssetsByType(AssetType.Ears);
         SetFaceObjectPart(tempAssets[Random.Range(0, tempAssets.Count)], false);
 
-        //   tempAssets = AvatarCreatorContext.GetLoadedAssetsByTypeAndGender(AssetType.Hair, randomGender);
+        // Hair
         tempAssets = AvatarCreatorContext.GetLoadedAssetsByType(AssetType.Hair);
         SetFaceObjectPart(tempAssets[Random.Range(0, tempAssets.Count)], false);
 
-        //tempAssets = AvatarCreatorContext.GetLoadedAssetsByType(AssetType.Eyes);
-        //SetFaceObjectPart(tempAssets[Random.Range(0, tempAssets.Count)], false);
+        // Eyes
+        tempAssets = AvatarCreatorContext.GetLoadedAssetsByType(AssetType.Eyes);
+        SetFaceObjectPart(tempAssets[Random.Range(0, tempAssets.Count)], false);
 
+        // Eyebrows
         tempAssets = AvatarCreatorContext.GetLoadedAssetsByType(AssetType.Eyebrows);
         SetFaceObjectPart(tempAssets[Random.Range(0, tempAssets.Count)], false);
 
+        // Nose
         tempAssets = AvatarCreatorContext.GetLoadedAssetsByType(AssetType.Nose);
         SetFaceObjectPart(tempAssets[Random.Range(0, tempAssets.Count)], false);
+
+        // Lips
+        tempAssets = AvatarCreatorContext.GetLoadedAssetsByType(AssetType.Mouth);
+        SetFaceObjectPart(tempAssets[Random.Range(0, tempAssets.Count)], false);
+
+        // Moustache
+        tempAssets = AvatarCreatorContext.GetLoadedAssetsByType(AssetType.Moustache);
+        SetFaceObjectPart(tempAssets[Random.Range(0, tempAssets.Count)], false);
+
+        // Beard
+        tempAssets = AvatarCreatorContext.GetLoadedAssetsByType(AssetType.Beard);
+        SetFaceObjectPart(tempAssets[Random.Range(0, tempAssets.Count)], false);
+
+        //// Facetexture
+        //tempAssets = AvatarCreatorContext.GetLoadedAssetsByType(AssetType.FaceTexture);
+        //SetFaceObjectPart(tempAssets[Random.Range(0, tempAssets.Count)], false);
+
+        // Skin color
+        AvatarCreatorContext.selectedAssetType = AssetType.HeadShape;
+        List<Color> colorList = AvatarCreatorContext.GetPaletteColors(ColorPalette.Skin);
+        ChangeAssetColor(colorList[Random.Range(0, colorList.Count)]);
     }
 
     private void ManageSpriteVisibility(Transform root)
@@ -87,7 +112,7 @@ public class FaceObjectController : MonoBehaviour
     public void SetFaceObjectPart(CBaseAsset asset, bool isUserAction=true)
     {
         if (asset == null)
-            return;
+            asset = m_currentAsset;
 
         if (asset.GetAssetType() == AssetType.None)
             return;
@@ -96,8 +121,8 @@ public class FaceObjectController : MonoBehaviour
 
         if (asset.GetAssetType() == AssetType.Hair)
         {
-            Transform hairFront = currentTransform.Find("fo_hair_front");
-            Transform hairBack = currentTransform.Find("fo_hair_back");
+            Transform hairFront = currentTransform;
+            Transform hairBack = currentTransform.parent.Find("fo_hair_back");
 
             if (asset.GetSprites().ContainsKey(SpritePart.Front))
                 hairFront.GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Front][(int)AvatarCreatorContext.currentRealismLevel];
@@ -164,10 +189,17 @@ public class FaceObjectController : MonoBehaviour
             m_transforms[AssetType.SpecialBody].gameObject.SetActive(true);
             gameObject.transform.Find("fo_mask").gameObject.GetComponent<Mask>().enabled = true;
         }
+        else if(asset.GetAssetType() == AssetType.Ghutra)
+        {
+            currentTransform.GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Front][0];
+            currentTransform.parent.Find("fo_ghutra_back").GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Back][0];
+        }
         else
         {
             currentTransform.GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Default][(int)AvatarCreatorContext.currentRealismLevel];
         }
+
+        m_currentAsset = asset;
     }
 
     private bool CheckPreviousAssetAndRemove(Transform currentObject, Sprite currentAsset)
@@ -234,6 +266,11 @@ public class FaceObjectController : MonoBehaviour
         }
 
         currentObject.localPosition = tempPos;
+
+        if (AvatarCreatorContext.selectedAssetType == AssetType.Hair)
+            currentObject.parent.Find("fo_hair_back").localPosition = tempPos;
+        else if (AvatarCreatorContext.selectedAssetType == AssetType.Ghutra)
+            currentObject.parent.Find("fo_ghutra_back").localPosition = tempPos;
     }
 
     public void ResizeAsset(AssetModifyFlag modifyFlag, bool isPositiveRate)
@@ -290,7 +327,7 @@ public class FaceObjectController : MonoBehaviour
     {
         Transform currentObject = m_transforms[AvatarCreatorContext.selectedAssetType];
 
-        float distanceOffset = 0.3f;
+        float distanceOffset = 1f;
 
         Transform left = currentObject.transform.GetChild(0);
         Transform right = currentObject.transform.GetChild(1);
@@ -312,7 +349,7 @@ public class FaceObjectController : MonoBehaviour
         Transform currentObject = m_transforms[AvatarCreatorContext.selectedAssetType];
 
       //  float maxAngle = 30f;
-        float rotateOffset = 0.3f;
+        float rotateOffset = 1f;
 
         Transform left = currentObject.transform.GetChild(0);
         Transform right = currentObject.transform.GetChild(1);
@@ -368,8 +405,8 @@ public class FaceObjectController : MonoBehaviour
                 }
             case AssetType.Hair:
                 {
-                    currentObject.Find("fo_hair_front").GetComponent<Image>().color = color;
-                    currentObject.Find("fo_hair_back").GetComponent<Image>().color = color;
+                    currentObject.GetComponent<Image>().color = color;
+                    currentObject.parent.Find("fo_hair_back").GetComponent<Image>().color = color;
                     break;
                 }
             case AssetType.Moustache:
@@ -391,7 +428,14 @@ public class FaceObjectController : MonoBehaviour
                     currentObject.Find("fo_eyebrow_right").GetComponent<Image>().color = color;
                     break;
                 }
-        }        
+            case AssetType.FaceTexture:
+                {
+                    m_transforms[AssetType.FaceTexture].GetComponent<Image>().color = color;
+                    break;
+                }
+        }
+
+        AvatarCreatorContext.logManager.LogAction("AssetColorChanged", ColorUtility.ToHtmlStringRGB(color));
 
         //if (currentObject.childCount > 0)
         //{
