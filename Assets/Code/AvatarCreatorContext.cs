@@ -40,12 +40,9 @@ public class AvatarCreatorContext : MonoBehaviour {
         faceObject = GameObject.Find("FaceObject").GetComponent<FaceObjectController>();
         selectedAssetType = AssetType.None;
 
-        // No genders are TODO. Depends to the provided content.
+        // Assets
         InitAssets("FaceObject/fo_faceshape/", AssetType.HeadShape, AssetGender.NoGender);
         InitAssets("FaceObject/fo_hair/", AssetType.Hair, AssetGender.NoGender);
-
-        //InitAssets("FaceObject/fo_hair/male/", AssetType.Hair, AssetGender.Male);
-        //InitAssets("FaceObject/fo_hair/female/", AssetType.Hair, AssetGender.Female);
         InitAssets("FaceObject/fo_ears/", AssetType.Ears, AssetGender.NoGender);
         InitAssets("FaceObject/fo_eyes/", AssetType.Eyes, AssetGender.NoGender);
         InitAssets("FaceObject/fo_eyebrows/", AssetType.Eyebrows, AssetGender.NoGender);
@@ -108,8 +105,7 @@ public class AvatarCreatorContext : MonoBehaviour {
 
         // Add empty asset in order to delete the already selected one.
         if(assetType == AssetType.Hair || assetType == AssetType.Eyebrows || assetType == AssetType.Glasses
-            || assetType == AssetType.FaceTexture || assetType == AssetType.Moustache || assetType == AssetType.Beard 
-            || assetType == AssetType.SpecialBody || assetType == AssetType.Ghutra)
+            || assetType == AssetType.FaceTexture || assetType == AssetType.Moustache || assetType == AssetType.Beard)
             assets.Add(assetFactory.CreateAsset(assetType, assetGender, ""));
 
         foreach(Sprite sprite in sprites)

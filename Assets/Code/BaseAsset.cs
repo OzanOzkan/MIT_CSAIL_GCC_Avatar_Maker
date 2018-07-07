@@ -447,10 +447,8 @@ public class CSpecialBody : CBaseAsset
 
     protected override void LoadSpriteOverride(string assetPath)
     {
-        Sprite spriteToLoad;
-
         // Layered?
-        if (spriteToLoad = Resources.Load<Sprite>(assetPath + "_A_L1"))
+        if (Resources.Load<Sprite>(assetPath + "_A_L1"))
         {
             List<Sprite> backLayers = new List<Sprite>()
             {
@@ -461,11 +459,20 @@ public class CSpecialBody : CBaseAsset
 
             m_sprites.Add(SpritePart.Back, backLayers);
 
-            List<Sprite> frontLayers = new List<Sprite>()
+            List<Sprite> defaultLayers = new List<Sprite>()
             {
                 Resources.Load<Sprite>(assetPath + "_A_L2"),
                 Resources.Load<Sprite>(assetPath + "_B_L2"),
                 Resources.Load<Sprite>(assetPath + "_C_L2")
+            };
+
+            m_sprites.Add(SpritePart.Default, defaultLayers);
+
+            List<Sprite> frontLayers = new List<Sprite>()
+            {
+                Resources.Load<Sprite>(assetPath + "_A_L3"),
+                Resources.Load<Sprite>(assetPath + "_B_L3"),
+                Resources.Load<Sprite>(assetPath + "_C_L3")
             };
 
             m_sprites.Add(SpritePart.Front, frontLayers);

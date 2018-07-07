@@ -79,6 +79,10 @@ public class FaceObjectController : MonoBehaviour
         tempAssets = AvatarCreatorContext.GetLoadedAssetsByType(AssetType.Beard);
         SetFaceObjectPart(tempAssets[Random.Range(0, tempAssets.Count)], false);
 
+        // Body
+        tempAssets = AvatarCreatorContext.GetLoadedAssetsByType(AssetType.Body);
+        SetFaceObjectPart(tempAssets[Random.Range(0, tempAssets.Count)], false);
+
         //// Facetexture
         //tempAssets = AvatarCreatorContext.GetLoadedAssetsByType(AssetType.FaceTexture);
         //SetFaceObjectPart(tempAssets[Random.Range(0, tempAssets.Count)], false);
@@ -87,6 +91,20 @@ public class FaceObjectController : MonoBehaviour
         AvatarCreatorContext.selectedAssetType = AssetType.HeadShape;
         List<Color> colorList = AvatarCreatorContext.GetPaletteColors(ColorPalette.Skin);
         ChangeAssetColor(colorList[Random.Range(0, colorList.Count)]);
+
+        // Hair color
+        AvatarCreatorContext.selectedAssetType = AssetType.Hair;
+        colorList = AvatarCreatorContext.GetPaletteColors(ColorPalette.Default);
+        Color color = colorList[Random.Range(0, colorList.Count)];
+        ChangeAssetColor(color);
+
+        // Beard color
+        AvatarCreatorContext.selectedAssetType = AssetType.Beard;
+        ChangeAssetColor(color);
+
+        // Moustache color
+        AvatarCreatorContext.selectedAssetType = AssetType.Moustache;
+        ChangeAssetColor(color);
     }
 
     private void ManageSpriteVisibility(Transform root)
@@ -175,15 +193,20 @@ public class FaceObjectController : MonoBehaviour
         }
         else if(asset.GetAssetType() == AssetType.SpecialBody)
         {
-            if (asset.GetSprites().ContainsKey(SpritePart.Front))
-                currentTransform.Find("fo_specialbody_L1").GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Front][(int)AvatarCreatorContext.currentRealismLevel];
+            if (asset.GetSprites().ContainsKey(SpritePart.Back))
+                currentTransform.Find("fo_specialbody_L1").GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Back][(int)AvatarCreatorContext.currentRealismLevel];
             else
                 currentTransform.Find("fo_specialbody_L1").GetComponent<Image>().sprite = null;
 
-            if (asset.GetSprites().ContainsKey(SpritePart.Back))
-                currentTransform.Find("fo_specialbody_L2").GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Back][(int)AvatarCreatorContext.currentRealismLevel];
+            if (asset.GetSprites().ContainsKey(SpritePart.Default))
+                currentTransform.Find("fo_specialbody_L2").GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Default][(int)AvatarCreatorContext.currentRealismLevel];
             else
                 currentTransform.Find("fo_specialbody_L2").GetComponent<Image>().sprite = null;
+
+            if (asset.GetSprites().ContainsKey(SpritePart.Front))
+                currentTransform.Find("fo_specialbody_L3").GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Front][(int)AvatarCreatorContext.currentRealismLevel];
+            else
+                currentTransform.Find("fo_specialbody_L3").GetComponent<Image>().sprite = null;
 
             m_transforms[AssetType.Body].gameObject.SetActive(false);
             m_transforms[AssetType.SpecialBody].gameObject.SetActive(true);
@@ -395,7 +418,7 @@ public class FaceObjectController : MonoBehaviour
 
                     m_transforms[AssetType.Body].transform.Find("fo_body_L2").GetComponent<Image>().color = color;
 
-                    m_transforms[AssetType.SpecialBody].transform.Find("fo_specialbody_L1").GetComponent<Image>().color = color;
+                    m_transforms[AssetType.SpecialBody].transform.Find("fo_specialbody_L2").GetComponent<Image>().color = color;
                     break;
                 }
             case AssetType.Mouth:
@@ -431,6 +454,11 @@ public class FaceObjectController : MonoBehaviour
             case AssetType.FaceTexture:
                 {
                     m_transforms[AssetType.FaceTexture].GetComponent<Image>().color = color;
+                    break;
+                }
+            case AssetType.SpecialBody:
+                {
+                    m_transforms[AssetType.SpecialBody].transform.Find("fo_specialbody_L3").GetComponent<Image>().color = color;
                     break;
                 }
         }
