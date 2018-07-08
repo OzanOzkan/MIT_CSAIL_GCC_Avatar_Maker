@@ -10,6 +10,12 @@ public class ScreenShotCapturer : MonoBehaviour {
     public int w;
     public int h;
 
+    private void Update()
+    {
+        gameObject.GetComponent<Camera>().backgroundColor = AvatarCreatorContext.gameCamera.backgroundColor;
+        gameObject.GetComponent<Camera>().enabled = AvatarCreatorContext.takeScreenShot;
+    }
+
     private void OnPostRender()
     {
         if (AvatarCreatorContext.takeScreenShot)
@@ -37,7 +43,12 @@ public class ScreenShotCapturer : MonoBehaviour {
             tex.Apply();
             RenderTexture.active = originalTexture;
 
-            GameObject.Find("testimg").GetComponent<Image>().sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
+            AvatarCreatorContext.fileTransferManager.DownloadScreenshot(tex.EncodeToPNG());
+            Destroy(tex);
+
+            AvatarCreatorContext.takeScreenShot = false;
+
+            //GameObject.Find("testimg").GetComponent<Image>().sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
         }
     }
 }

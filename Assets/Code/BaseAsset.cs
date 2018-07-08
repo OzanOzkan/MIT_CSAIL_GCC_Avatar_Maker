@@ -167,6 +167,8 @@ public class CBaseAssetFactory
                 return new CSpecialBody(gender, assetPath);
             case AssetType.Ghutra:
                 return new CGhutra(gender, assetPath);
+            case AssetType.BackgroundTexture:
+                return new CBGTexture(gender, assetPath);
         }
 
         return null;
@@ -515,4 +517,11 @@ public class CGhutra : CBaseAsset
 
         m_sprites.Add(SpritePart.Front, frontLayers);
     }
+}
+
+public class CBGTexture : CBaseAsset
+{
+    public CBGTexture(AssetGender gender, string assetPath)
+        : base(gender, AssetType.BackgroundTexture, 0, assetPath)
+    { }
 }

@@ -30,6 +30,7 @@ public class FaceObjectController : MonoBehaviour
         m_transforms.Add(AssetType.Body, gameObject.transform.Find("fo_body"));
         m_transforms.Add(AssetType.SpecialBody, gameObject.transform.Find("fo_specialbody"));
         m_transforms.Add(AssetType.Ghutra, gameObject.transform.Find("fo_ghutra_front"));
+        m_transforms.Add(AssetType.BackgroundTexture, gameObject.transform.Find("bg_texture"));
     }
 
     private void Update()
@@ -105,6 +106,19 @@ public class FaceObjectController : MonoBehaviour
         // Moustache color
         AvatarCreatorContext.selectedAssetType = AssetType.Moustache;
         ChangeAssetColor(color);
+
+        // Eyebrows color
+        AvatarCreatorContext.selectedAssetType = AssetType.Eyebrows;
+        ChangeAssetColor(color);
+
+        // Background
+        tempAssets = AvatarCreatorContext.GetLoadedAssetsByType(AssetType.BackgroundTexture);
+        AvatarCreatorContext.selectedAssetType = AssetType.BackgroundTexture;
+        SetFaceObjectPart(tempAssets[Random.Range(0, tempAssets.Count)], false);
+        ChangeAssetColor(colorList[Random.Range(0, colorList.Count)]);
+
+        // Default selected category
+        AvatarCreatorContext.selectedAssetType = AssetType.Body;
     }
 
     private void ManageSpriteVisibility(Transform root)
@@ -377,23 +391,15 @@ public class FaceObjectController : MonoBehaviour
         Transform left = currentObject.transform.GetChild(0);
         Transform right = currentObject.transform.GetChild(1);
 
-       // Debug.Log("Left: " + left.localEulerAngles.z + " Right:" + right.localEulerAngles.z);
-
         if (direction) // right
         {
                 right.Rotate(0, 0, -rotateOffset);
                 left.rotation = Quaternion.Inverse(right.localRotation);
-
-            //left.Rotate(0, 0, rotateOffset);
-            //right.Rotate(0, 0, -rotateOffset);
         }
         else // left
         {
                 left.Rotate(0, 0, -rotateOffset);
                 right.rotation = Quaternion.Inverse(left.localRotation);
-
-            //left.Rotate(0, 0, -rotateOffset);
-            //right.Rotate(0, 0, rotateOffset);
         }
     }
 
@@ -461,26 +467,15 @@ public class FaceObjectController : MonoBehaviour
                     m_transforms[AssetType.SpecialBody].transform.Find("fo_specialbody_L3").GetComponent<Image>().color = color;
                     break;
                 }
+            case AssetType.BackgroundTexture:
+                {
+                    m_transforms[AssetType.BackgroundTexture].GetComponent<Image>().color = color;
+                    AvatarCreatorContext.bgColor = color;
+                    break;
+                }
         }
 
         AvatarCreatorContext.logManager.LogAction("AssetColorChanged", ColorUtility.ToHtmlStringRGB(color));
-
-        //if (currentObject.childCount > 0)
-        //{
-        //    for (int i = 0; i < currentObject.childCount; ++i)
-        //    {
-        //        currentObject.GetChild(i).GetComponent<Image>().color = color;
-        //    }
-        //}
-        //else
-        //{
-        //    currentObject.GetComponent<Image>().color = color;
-        //}
-    }
-
-    public void SetRealismLevel(int level)
-    {
-
     }
 
     public string Serialize()
@@ -489,24 +484,8 @@ public class FaceObjectController : MonoBehaviour
 
         StringBuilder content = new StringBuilder();
         content.Append("<FaceObject>\n");
-
-        content.Append(SerializeSubObjects(GameObject.Find("FaceObject").transform));
-
-        //foreach (KeyValuePair<AssetType, Transform> fObject in m_transforms)
-        //{
-        //    if (fObject.Value.childCount > 0)
-        //    {
-        //        for (int i = 0; i < fObject.Value.childCount; ++i)
-        //        {
-        //            content.Append(PrepareSerializeLine(fObject.Key, fObject.Value.GetChild(i)));
-        //        }
-        //    }
-        //    else
-        //    {
-        //        content.Append(PrepareSerializeLine(fObject.Key, fObject.Value));
-        //    }
-        //}
-
+        content.Append(PrepareSerializeLine(gameObject.transform));
+        content.Append(SerializeSubObjects(gameObject.transform));
         content.Append("</FaceObject>");
 
         return content.ToString();
@@ -659,8 +638,6 @@ public class FaceObjectController : MonoBehaviour
             if (asset == null)
                 asset = new CBaseAsset(AssetGender.NoGender, assetType, 0, "");
 
-            //AvatarCreatorContext.selectedAssetType = asset.GetAssetType();
-
             GameObject gObject = GameObject.Find(objectName);
             if (gObject)
             {
@@ -673,10 +650,6 @@ public class FaceObjectController : MonoBehaviour
             }
 
             SetFaceObjectPart(asset, false);
-
-            //Transform selectedAsset = m_transforms[assetType];
-
-           // ChangeAssetColor(color, gameObject.transform);
         }
     }
 }

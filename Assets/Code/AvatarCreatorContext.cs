@@ -27,12 +27,19 @@ public class AvatarCreatorContext : MonoBehaviour {
     public static Transform defaultColorPalette;
     public static Transform skinColorPalette;
 
+    public static Sprite bgTexture;
+    public static Color bgColor;
+
+    public static Camera gameCamera;
+
     // Use this for initialization
     void Start () {
         DontDestroyOnLoad(this.gameObject);
 
         sessionguid = System.Guid.NewGuid();
         GameObject.Find("txt_guid").GetComponent<Text>().text = sessionguid.ToString();
+
+        gameCamera = GameObject.Find("Main Camera").GetComponent<Camera>();
 
         logManager = gameObject.GetComponent<LogManager>();
         fileTransferManager = gameObject.GetComponent<FileTransferManager>();
@@ -55,6 +62,7 @@ public class AvatarCreatorContext : MonoBehaviour {
         InitAssets("FaceObject/fo_body/", AssetType.Body, AssetGender.NoGender);
         InitAssets("FaceObject/fo_specialbody/", AssetType.SpecialBody, AssetGender.Female);
         InitAssets("FaceObject/fo_ghutra/", AssetType.Ghutra, AssetGender.Male);
+        InitAssets("UI/bg_patterns/", AssetType.BackgroundTexture, AssetGender.NoGender);
 
         // Set the default selected category as Body.
         GameObject.Find("btn_body").GetComponent<UIAssetCategoryButtonController>().OnButtonClick();
@@ -91,6 +99,8 @@ public class AvatarCreatorContext : MonoBehaviour {
                     break;
                 }
         }
+
+        gameCamera.backgroundColor = bgColor;
     }
 
     private void InitAssets(string directoryPath, AssetType assetType, AssetGender assetGender)
@@ -105,7 +115,8 @@ public class AvatarCreatorContext : MonoBehaviour {
 
         // Add empty asset in order to delete the already selected one.
         if(assetType == AssetType.Hair || assetType == AssetType.Eyebrows || assetType == AssetType.Glasses
-            || assetType == AssetType.FaceTexture || assetType == AssetType.Moustache || assetType == AssetType.Beard)
+            || assetType == AssetType.FaceTexture || assetType == AssetType.Moustache || assetType == AssetType.Beard 
+            || assetType == AssetType.BackgroundTexture || assetType == AssetType.Ghutra)
             assets.Add(assetFactory.CreateAsset(assetType, assetGender, ""));
 
         foreach(Sprite sprite in sprites)

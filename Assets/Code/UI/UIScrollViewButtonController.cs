@@ -15,6 +15,7 @@ public class UIScrollViewButtonController : MonoBehaviour
         btnFaceObject.transform.localPosition = new Vector3(0, 0, 0);
         btnFaceObject.transform.localScale = new Vector3(5, 5, 5);
         btnFaceObject.GetComponent<FaceObjectController>().SetFaceObjectPart(faceAsset, false);
+        gameObject.transform.Find("Panel").GetComponent<Image>().color = AvatarCreatorContext.bgColor;
     }
 
     public void OnButtonClick()
