@@ -56,7 +56,8 @@ public enum SpritePart
     Front,
     Back,
     Left,
-    Right
+    Right,
+    Reserved
 }
 
 public enum RealismLevel
@@ -274,6 +275,15 @@ public class CEyes : CBaseAsset
 
     protected override void LoadSpriteOverride(string assetPath)
     {
+        List<Sprite> skinColorizedLayers = new List<Sprite>()
+            {
+                Resources.Load<Sprite>(assetPath + "_A_L0"),
+                Resources.Load<Sprite>(assetPath + "_B_L0"),
+                Resources.Load<Sprite>(assetPath + "_C_L0")
+            };
+
+        m_sprites.Add(SpritePart.Reserved, skinColorizedLayers);
+
         List<Sprite> nonColorizedLayers = new List<Sprite>()
             {
                 Resources.Load<Sprite>(assetPath + "_A_L1"),

@@ -30,7 +30,7 @@ public class FaceObjectController : MonoBehaviour
         m_transforms.Add(AssetType.Body, gameObject.transform.Find("fo_body"));
         m_transforms.Add(AssetType.SpecialBody, gameObject.transform.Find("fo_specialbody"));
         m_transforms.Add(AssetType.Ghutra, gameObject.transform.Find("fo_ghutra_front"));
-        m_transforms.Add(AssetType.BackgroundTexture, gameObject.transform.Find("bg_texture"));
+        m_transforms.Add(AssetType.BackgroundTexture, gameObject.transform.parent.Find("bg_texture"));
     }
 
     private void Update()
@@ -72,13 +72,13 @@ public class FaceObjectController : MonoBehaviour
         tempAssets = AvatarCreatorContext.GetLoadedAssetsByType(AssetType.Mouth);
         SetFaceObjectPart(tempAssets[Random.Range(0, tempAssets.Count)], false);
 
-        // Moustache
-        tempAssets = AvatarCreatorContext.GetLoadedAssetsByType(AssetType.Moustache);
-        SetFaceObjectPart(tempAssets[Random.Range(0, tempAssets.Count)], false);
+        // Moustache - Removed due to request
+        //tempAssets = AvatarCreatorContext.GetLoadedAssetsByType(AssetType.Moustache);
+        //SetFaceObjectPart(tempAssets[Random.Range(0, tempAssets.Count)], false);
 
-        // Beard
-        tempAssets = AvatarCreatorContext.GetLoadedAssetsByType(AssetType.Beard);
-        SetFaceObjectPart(tempAssets[Random.Range(0, tempAssets.Count)], false);
+        // Beard - Removed due to request
+        //tempAssets = AvatarCreatorContext.GetLoadedAssetsByType(AssetType.Beard);
+        //SetFaceObjectPart(tempAssets[Random.Range(0, tempAssets.Count)], false);
 
         // Body
         tempAssets = AvatarCreatorContext.GetLoadedAssetsByType(AssetType.Body);
@@ -91,7 +91,17 @@ public class FaceObjectController : MonoBehaviour
         // Skin color
         AvatarCreatorContext.selectedAssetType = AssetType.HeadShape;
         List<Color> colorList = AvatarCreatorContext.GetPaletteColors(ColorPalette.Skin);
-        ChangeAssetColor(colorList[Random.Range(0, colorList.Count)]);
+        Color skinColor = colorList[Random.Range(0, colorList.Count)];
+        ChangeAssetColor(skinColor);
+
+        // FaceTexture
+        AvatarCreatorContext.selectedAssetType = AssetType.FaceTexture;
+        ChangeAssetColor(skinColor);
+        if(m_transforms[AssetType.FaceTexture].GetComponent<Image>().sprite != null)
+        {
+            tempAssets = AvatarCreatorContext.GetLoadedAssetsByType(AssetType.FaceTexture);
+            SetFaceObjectPart(tempAssets[Random.Range(0, tempAssets.Count)], false);
+        }
 
         // Hair color
         AvatarCreatorContext.selectedAssetType = AssetType.Hair;
@@ -169,6 +179,14 @@ public class FaceObjectController : MonoBehaviour
                 hairBack.GetComponent<Image>().sprite = null;
             }
 
+            // Remove ghutra
+            if(asset.GetSprites()[SpritePart.Front][(int)AvatarCreatorContext.currentRealismLevel] == null)
+            {
+                m_transforms[AssetType.Ghutra].GetComponent<Image>().sprite = null;
+                m_transforms[AssetType.Ghutra].parent.Find("fo_ghutra_back").GetComponent<Image>().sprite = null;
+            }
+
+
         }
         else if (asset.GetAssetType() == AssetType.Eyebrows
                     || asset.GetAssetType() == AssetType.Ears)
@@ -183,10 +201,12 @@ public class FaceObjectController : MonoBehaviour
             Transform eye_left = currentTransform.Find("fo_eye_left");
             Transform eye_right = currentTransform.Find("fo_eye_right");
 
+            eye_left.Find("fo_eye_left_L0").GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Reserved][(int)AvatarCreatorContext.currentRealismLevel];
             eye_left.Find("fo_eye_left_L1").GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Back][(int)AvatarCreatorContext.currentRealismLevel];
             eye_left.Find("fo_eye_left_L2").GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Default][(int)AvatarCreatorContext.currentRealismLevel];
             eye_left.Find("fo_eye_left_L3").GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Front][(int)AvatarCreatorContext.currentRealismLevel];
 
+            eye_right.Find("fo_eye_right_L0").GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Reserved][(int)AvatarCreatorContext.currentRealismLevel];
             eye_right.Find("fo_eye_right_L1").GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Back][(int)AvatarCreatorContext.currentRealismLevel];
             eye_right.Find("fo_eye_right_L2").GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Default][(int)AvatarCreatorContext.currentRealismLevel];
             eye_right.Find("fo_eye_right_L3").GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Front][(int)AvatarCreatorContext.currentRealismLevel];
@@ -230,6 +250,27 @@ public class FaceObjectController : MonoBehaviour
         {
             currentTransform.GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Front][0];
             currentTransform.parent.Find("fo_ghutra_back").GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Back][0];
+        }
+        else if (asset.GetAssetType() == AssetType.Beard 
+                || asset.GetAssetType() == AssetType.Moustache)
+        {
+            if (asset.GetSprites()[SpritePart.Default][(int)AvatarCreatorContext.currentRealismLevel] == null)
+            {
+                if (asset.GetAssetType() == AssetType.Beard)
+                {
+                    currentTransform.GetComponent<Image>().sprite = null;
+                    currentTransform.parent.Find("fo_mask").Find("fo_moustache").GetComponent<Image>().sprite = null;
+                }
+                else
+                {
+                    currentTransform.GetComponent<Image>().sprite = null;
+                    currentTransform.parent.parent.Find("fo_beard").GetComponent<Image>().sprite = null;
+                }
+            }
+            else
+            {
+                currentTransform.GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Default][(int)AvatarCreatorContext.currentRealismLevel];
+            }
         }
         else
         {
@@ -425,6 +466,9 @@ public class FaceObjectController : MonoBehaviour
                     m_transforms[AssetType.Body].transform.Find("fo_body_L2").GetComponent<Image>().color = color;
 
                     m_transforms[AssetType.SpecialBody].transform.Find("fo_specialbody_L2").GetComponent<Image>().color = color;
+
+                    m_transforms[AssetType.Eyes].Find("fo_eye_left").Find("fo_eye_left_L0").GetComponent<Image>().color = color;
+                    m_transforms[AssetType.Eyes].Find("fo_eye_right").Find("fo_eye_right_L0").GetComponent<Image>().color = color;
                     break;
                 }
             case AssetType.Mouth:

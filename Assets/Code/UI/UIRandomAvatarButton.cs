@@ -18,6 +18,7 @@ public class UIRandomAvatarButton : MonoBehaviour {
     public void OnButtonClick()
     {
         AvatarCreatorContext.faceObject.GenerateRandomAvatar();
+        AvatarCreatorContext.UpdateAssetCategoryList();
         AvatarCreatorContext.logManager.LogAction("UIButtonClick","CreateRandomAvatar");
     }
 }

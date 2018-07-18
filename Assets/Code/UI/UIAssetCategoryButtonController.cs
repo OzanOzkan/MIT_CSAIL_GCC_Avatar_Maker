@@ -25,15 +25,14 @@ public class UIAssetCategoryButtonController : MonoBehaviour
         if (AvatarCreatorContext.selectedAssetType != m_assetType)
             gameObject.transform.GetChild(0).GetComponent<Image>().sprite = m_notSelectedBorder;
         else
-        {
             gameObject.transform.GetChild(0).GetComponent<Image>().sprite = m_selectedBorder;
-            //UpdateScrollList();
-        }
     }
 
     public void OnButtonClick()
     {
         AvatarCreatorContext.selectedAssetType = m_assetType;
+        AvatarCreatorContext.activeAssetCategoryButton = this;
+
         Debug.Log("Asset type changed to: " + m_assetType.ToString());
 
         AvatarCreatorContext.logManager.LogAction("AssetSelected", m_assetType.ToString());
@@ -41,7 +40,7 @@ public class UIAssetCategoryButtonController : MonoBehaviour
         UpdateScrollList();
     }
 
-    private void UpdateScrollList()
+    public void UpdateScrollList()
     {
         scrollView.DestroyChildren();
 

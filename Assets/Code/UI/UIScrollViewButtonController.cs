@@ -11,10 +11,14 @@ public class UIScrollViewButtonController : MonoBehaviour
     {
         //gameObject.GetComponent<Image>().sprite = faceAsset.GetSprites()[SpritePart.Default];
         gameObject.GetComponent<Button>().onClick.AddListener(() => OnButtonClick());
-        GameObject btnFaceObject = Instantiate(AvatarCreatorContext.faceObject.gameObject, gameObject.transform.Find("Panel"));
+        GameObject btnFaceObject = Instantiate(AvatarCreatorContext.faceObject.gameObject.transform.parent.gameObject, gameObject.transform.Find("Panel"));
         btnFaceObject.transform.localPosition = new Vector3(0, 0, 0);
         btnFaceObject.transform.localScale = new Vector3(5, 5, 5);
-        btnFaceObject.GetComponent<FaceObjectController>().SetFaceObjectPart(faceAsset, false);
+        btnFaceObject.transform.Find("FaceObject").GetComponent<FaceObjectController>().SetFaceObjectPart(faceAsset, false);
+        btnFaceObject.transform.Find("FaceObject").localPosition = new Vector3(0, 0, 0);
+        btnFaceObject.transform.Find("FaceObject").localScale = new Vector3(1, 1, 1);
+        btnFaceObject.transform.Find("bg_texture").localPosition = new Vector3(0, 0, 0);
+        btnFaceObject.transform.Find("bg_texture").GetComponent<RectTransform>().sizeDelta = new Vector2(50, 50);
         gameObject.transform.Find("Panel").GetComponent<Image>().color = AvatarCreatorContext.bgColor;
     }
 
@@ -22,6 +26,7 @@ public class UIScrollViewButtonController : MonoBehaviour
     {
         AvatarCreatorContext.faceObject.SetFaceObjectPart(faceAsset);
         AvatarCreatorContext.selectedAssetType = faceAsset.GetAssetType();
+        //AvatarCreatorContext.UpdateAssetCategoryList();
 
        //AvatarCreatorContext.logManager.LogAction("AssetSelected", faceAsset.GetSprites()[SpritePart.Default][0].name);
     }

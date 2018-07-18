@@ -32,6 +32,8 @@ public class AvatarCreatorContext : MonoBehaviour {
 
     public static Camera gameCamera;
 
+    public static UIAssetCategoryButtonController activeAssetCategoryButton;
+
     // Use this for initialization
     void Start () {
         DontDestroyOnLoad(this.gameObject);
@@ -115,7 +117,7 @@ public class AvatarCreatorContext : MonoBehaviour {
 
         // Add empty asset in order to delete the already selected one.
         if(assetType == AssetType.Hair || assetType == AssetType.Eyebrows || assetType == AssetType.Glasses
-            || assetType == AssetType.FaceTexture || assetType == AssetType.Moustache || assetType == AssetType.Beard 
+            || assetType == AssetType.FaceTexture || /*assetType == AssetType.Moustache ||*/ assetType == AssetType.Beard 
             || assetType == AssetType.BackgroundTexture || assetType == AssetType.Ghutra)
             assets.Add(assetFactory.CreateAsset(assetType, assetGender, ""));
 
@@ -193,6 +195,11 @@ public class AvatarCreatorContext : MonoBehaviour {
         }
 
         return null;
+    }
+
+    public static void UpdateAssetCategoryList()
+    {
+        activeAssetCategoryButton.UpdateScrollList();
     }
 
     public static void SaveAvatarToFile()
