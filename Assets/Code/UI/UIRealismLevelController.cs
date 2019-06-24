@@ -20,6 +20,7 @@ public class UIRealismLevelController : MonoBehaviour {
         int realismLevel = System.Convert.ToInt32(gameObject.GetComponent<Slider>().value);
         AvatarCreatorContext.currentRealismLevel = (RealismLevel)realismLevel;
         AvatarCreatorContext.faceObject.SetFaceObjectPart(null);
+        AvatarCreatorContext.UpdateAssetCategoryList();
 
         AvatarCreatorContext.logManager.LogAction("RealismLevelChanged", AvatarCreatorContext.currentRealismLevel.ToString());
     }

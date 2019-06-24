@@ -33,7 +33,8 @@ public class ScreenShotCapturer : MonoBehaviour {
 
             //Destroy(tex);
 
-            //AvatarCreatorContext.takeScreenShot = false;
+
+            AvatarCreatorContext.takeScreenShot = false;
 
             RenderTexture originalTexture = RenderTexture.active;
             RenderTexture ssrTexture = gameObject.GetComponent<Camera>().activeTexture;
@@ -45,8 +46,6 @@ public class ScreenShotCapturer : MonoBehaviour {
 
             AvatarCreatorContext.fileTransferManager.DownloadScreenshot(tex.EncodeToPNG());
             Destroy(tex);
-
-            AvatarCreatorContext.takeScreenShot = false;
 
             //GameObject.Find("testimg").GetComponent<Image>().sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
         }
