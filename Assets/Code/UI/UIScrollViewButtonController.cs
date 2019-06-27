@@ -3,14 +3,22 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// A controller class for scroll view buttons (assets in the list).
+/// </summary>
 public class UIScrollViewButtonController : MonoBehaviour
 {
     public CBaseAsset faceAsset { get; set; }
 
+    /// <summary>
+    /// Called only once when application started.
+    /// </summary>
     private void Start()
     {
-        //gameObject.GetComponent<Image>().sprite = faceAsset.GetSprites()[SpritePart.Default];
+        // Register to button click events.
         gameObject.GetComponent<Button>().onClick.AddListener(() => OnButtonClick());
+
+        // Button configuration (position, scale, background etc.)
         GameObject btnFaceObject = Instantiate(AvatarCreatorContext.faceObject.gameObject.transform.parent.gameObject, gameObject.transform.Find("Panel"));
         btnFaceObject.transform.localPosition = new Vector3(0, 0, 0);
         btnFaceObject.transform.localScale = new Vector3(5, 5, 5);
@@ -22,12 +30,15 @@ public class UIScrollViewButtonController : MonoBehaviour
         gameObject.transform.Find("Panel").GetComponent<Image>().color = AvatarCreatorContext.bgColor;
     }
 
+    /// <summary>
+    /// Called in every value change.
+    /// </summary>
     public void OnButtonClick()
     {
+        // Send selected asset to face object. It will change the face.
         AvatarCreatorContext.faceObject.SetFaceObjectPart(faceAsset);
-        AvatarCreatorContext.selectedAssetType = faceAsset.GetAssetType();
-        //AvatarCreatorContext.UpdateAssetCategoryList();
 
-       //AvatarCreatorContext.logManager.LogAction("AssetSelected", faceAsset.GetSprites()[SpritePart.Default][0].name);
+        // Set global selected asset type variable to currently selected asset type.
+        AvatarCreatorContext.selectedAssetType = faceAsset.GetAssetType();
     }
 }

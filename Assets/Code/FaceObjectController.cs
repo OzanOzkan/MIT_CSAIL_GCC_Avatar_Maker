@@ -6,15 +6,34 @@ using System.Xml;
 using System.Text;
 using UnityEngine.UI;
 
+/// <summary>
+/// A class for FaceObject.
+/// Implements the functionality of FaceObject. Attached to FaceObject game object in the scene.
+/// </summary>
 public class FaceObjectController : MonoBehaviour
 {
+    /* Transforms are Unity components instantiated in scene.
+     * The Transform component determines the Position, Rotation, and Scale of each object in the scene. Every GameObject has a Transform.
+     * FaceObject consists of several Transform objects, dedicated for face parts such as head shape, ears, hair, eyes, eyebrows etc.
+     * Transform objects responsible of rendering assets using their Image component.
+     * Loaded asset objects stores their sprite objects. Those objects will be passed to respective transform's Image component.
+     * Position, rotation and scale manupilation also applied to Transform object directly.
+    */
+
+    // Asset objects of the face.
     public Dictionary<AssetType, Transform> m_transforms;
+
+    // Current selected asset for manipulation.
     private CBaseAsset m_currentAsset;
 
+    /// <summary>
+    /// Used to initialize variables. Called once by Unity before the scene starts.
+    /// </summary>
     private void Awake()
     {
         Transform mask = gameObject.transform.Find("fo_mask");
-        // GameObject mappings.
+
+        // GameObject mappings: Asset types and respective transforms.
         m_transforms = new Dictionary<AssetType, Transform>();
         m_transforms.Add(AssetType.HeadShape, mask.Find("fo_faceshape"));
         m_transforms.Add(AssetType.Ears, mask.Find("fo_ears"));
@@ -33,6 +52,9 @@ public class FaceObjectController : MonoBehaviour
         m_transforms.Add(AssetType.BackgroundTexture, gameObject.transform.parent.Find("bg_texture"));
     }
 
+    /// <summary>
+    /// Update function, called every frame. 
+    /// </summary>
     private void Update()
     {
         // Manage visibility of empty sprites. (Empty sprites displays as white planes)
@@ -42,6 +64,9 @@ public class FaceObjectController : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Generates a random avatar.
+    /// </summary>
     public void GenerateRandomAvatar()
     {
         // Head shape
@@ -131,6 +156,12 @@ public class FaceObjectController : MonoBehaviour
         AvatarCreatorContext.selectedAssetType = AssetType.Body;
     }
 
+    /// <summary>
+    /// Manages visibility of a transform.
+    /// If there is no asset attached to the transform, it means it is deleted. 
+    /// Transform without an asset will be hidden until a new asset will be loaded in the runtime by the user.
+    /// </summary>
+    /// <param name="root">Transform object of the root asset.</param>
     private void ManageSpriteVisibility(Transform root)
     {
         if (root.childCount == 0)
@@ -151,24 +182,36 @@ public class FaceObjectController : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Loads an asset object to the transform for displaying it on the face.
+    /// </summary>
+    /// <param name="asset">An asset object.</param>
+    /// <param name="isUserAction">True: Loaded by user. False: Loaded by codebase.</param>
     public void SetFaceObjectPart(CBaseAsset asset, bool isUserAction=true)
     {
+        // If asset parameter is null, we will manupilate the last selected asset.
         if (asset == null)
             asset = m_currentAsset;
 
+        // If asset is invalid, return.
         if (asset.GetAssetType() == AssetType.None)
             return;
 
+        // Get transforms of the specified asset's type from FaceObject.
         Transform currentTransform = m_transforms[asset.GetAssetType()];
 
+        // If current asset type is Hair, that means currently used asset is a Hair asset.
         if (asset.GetAssetType() == AssetType.Hair)
         {
+            // Get transforms of Hair from FaceObject.
             Transform hairFront = currentTransform;
             Transform hairBack = currentTransform.parent.Find("fo_hair_back");
 
+            // If current asset has Front part, assign it with the selected realism level.
             if (asset.GetSprites().ContainsKey(SpritePart.Front))
                 hairFront.GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Front][(int)AvatarCreatorContext.currentRealismLevel];
 
+            // If current asset has Back part, assign it with the selected realism level.
             if (asset.GetSprites().ContainsKey(SpritePart.Back))
             {
                 hairBack.GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Back][(int)AvatarCreatorContext.currentRealismLevel];
@@ -179,7 +222,7 @@ public class FaceObjectController : MonoBehaviour
                 hairBack.GetComponent<Image>().sprite = null;
             }
 
-            // Remove ghutra
+            // Remove ghutra. (We need to display the hair, so ghutra is not needed)
             if(asset.GetSprites()[SpritePart.Front][(int)AvatarCreatorContext.currentRealismLevel] == null)
             {
                 m_transforms[AssetType.Ghutra].GetComponent<Image>().sprite = null;
@@ -188,19 +231,24 @@ public class FaceObjectController : MonoBehaviour
 
 
         }
+        // If current asset type is Eyebrows or Ears
         else if (asset.GetAssetType() == AssetType.Eyebrows
                     || asset.GetAssetType() == AssetType.Ears)
         {
+            // Assign selected asset.
             for (int i = 0; i < currentTransform.childCount; ++i)
             {
                 currentTransform.GetChild(i).GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Default][(int)AvatarCreatorContext.currentRealismLevel];
             }
         }
+        // If current asset type is Eyes.
         else if (asset.GetAssetType() == AssetType.Eyes)
         {
+            // Get transforms of left and right eyes.
             Transform eye_left = currentTransform.Find("fo_eye_left");
             Transform eye_right = currentTransform.Find("fo_eye_right");
 
+            // Assign assets for left and right eye. 
             eye_left.Find("fo_eye_left_L0").GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Reserved][(int)AvatarCreatorContext.currentRealismLevel];
             eye_left.Find("fo_eye_left_L1").GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Back][(int)AvatarCreatorContext.currentRealismLevel];
             eye_left.Find("fo_eye_left_L2").GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Default][(int)AvatarCreatorContext.currentRealismLevel];
@@ -211,13 +259,17 @@ public class FaceObjectController : MonoBehaviour
             eye_right.Find("fo_eye_right_L2").GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Default][(int)AvatarCreatorContext.currentRealismLevel];
             eye_right.Find("fo_eye_right_L3").GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Front][(int)AvatarCreatorContext.currentRealismLevel];
         }
+        // If current asset type is Mouth
         else if (asset.GetAssetType() == AssetType.Mouth)
         {
+            // Assign assets for mouth.
             currentTransform.Find("fo_mouth_L1").GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Back][(int)AvatarCreatorContext.currentRealismLevel];
             currentTransform.Find("fo_mouth_L2").GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Default][(int)AvatarCreatorContext.currentRealismLevel];
         }
+        // If current asset type is Body
         else if(asset.GetAssetType() == AssetType.Body)
         {
+            // Assign assets for body.
             currentTransform.Find("fo_body_L1").GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Back][(int)AvatarCreatorContext.currentRealismLevel];
             currentTransform.Find("fo_body_L2").GetComponent<Image>().sprite = asset.GetSprites()[SpritePart.Default][(int)AvatarCreatorContext.currentRealismLevel];
 
@@ -280,6 +332,12 @@ public class FaceObjectController : MonoBehaviour
         m_currentAsset = asset;
     }
 
+    /// <summary>
+    /// Compares given transform's current loaded asset with given asset and if it is the same asset, removes it.
+    /// </summary>
+    /// <param name="currentObject">Transform to compare.</param>
+    /// <param name="currentAsset">Asset to compare.</param>
+    /// <returns>True if transform's asset removed. False if it is not.</returns>
     private bool CheckPreviousAssetAndRemove(Transform currentObject, Sprite currentAsset)
     {
         if (currentObject.childCount > 0)
@@ -306,6 +364,11 @@ public class FaceObjectController : MonoBehaviour
         return false;
     }
 
+    /// <summary>
+    /// Moves selected asset in horizontal and vertical directions.
+    /// </summary>
+    /// <param name="modifyFlag">Modification flag. Vertical or Horizontal</param>
+    /// <param name="isPositiveRate">True: Increment on move value. False: Decrement on move value.</param>
     public void MoveAsset(AssetModifyFlag modifyFlag, bool isPositiveRate)
     {
         Transform currentObject = m_transforms[AvatarCreatorContext.selectedAssetType];
@@ -351,10 +414,16 @@ public class FaceObjectController : MonoBehaviour
             currentObject.parent.Find("fo_ghutra_back").localPosition = tempPos;
     }
 
+    /// <summary>
+    /// Resizes or streches selected currently selected asset.
+    /// </summary>
+    /// <param name="modifyFlag">Modification flag. Resize, StrechHorizontal or StrechVertical.</param>
+    /// <param name="isPositiveRate">Ture: Increment on resize/strech. False: Decrement on resize/strech.</param>
     public void ResizeAsset(AssetModifyFlag modifyFlag, bool isPositiveRate)
     {
         Transform currentObject = m_transforms[AvatarCreatorContext.selectedAssetType];
 
+        // Predefined values.
         Vector3 maxScale = new Vector3(1.2f, 1.2f, 0);
         Vector3 minScale = new Vector3(0.8f, 0.8f, 0);
         float resizeOffset = 0.02f;
@@ -400,7 +469,10 @@ public class FaceObjectController : MonoBehaviour
         }
     }
 
-    // false: left, true: right
+    /// <summary>
+    /// Sets distance between currently selected asset pairs like eyes, ears.
+    /// </summary>
+    /// <param name="direction">True: Right. False: Left</param>
     public void SetDistance(bool direction)
     {
         Transform currentObject = m_transforms[AvatarCreatorContext.selectedAssetType];
@@ -422,30 +494,41 @@ public class FaceObjectController : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Rotates currently selected asset.
+    /// </summary>
+    /// <param name="direction">True: To right. False: To left</param>
     public void RotateAsset(bool direction)
     {
         Transform currentObject = m_transforms[AvatarCreatorContext.selectedAssetType];
 
-      //  float maxAngle = 30f;
+        // Predefined value.
+        //float maxAngle = 30f;
         float rotateOffset = 1f;
 
         Transform left = currentObject.transform.GetChild(0);
         Transform right = currentObject.transform.GetChild(1);
 
-        if (direction) // right
+        if (direction) // to right
         {
                 right.Rotate(0, 0, -rotateOffset);
                 left.rotation = Quaternion.Inverse(right.localRotation);
         }
-        else // left
+        else // to left
         {
                 left.Rotate(0, 0, -rotateOffset);
                 right.rotation = Quaternion.Inverse(left.localRotation);
         }
     }
 
+    /// <summary>
+    /// Changes currently selected asset's color.
+    /// </summary>
+    /// <param name="color">New color.</param>
+    /// <param name="currentObject">Transform object. Uses last selected object if it is not supplied.</param>
     public void ChangeAssetColor(Color color, Transform currentObject=null)
     {
+        // If transform object is not supplied, use last selected asset.
         if (currentObject == null)
             currentObject = m_transforms[AvatarCreatorContext.selectedAssetType];
 
@@ -522,6 +605,10 @@ public class FaceObjectController : MonoBehaviour
         AvatarCreatorContext.logManager.LogAction("AssetColorChanged", ColorUtility.ToHtmlStringRGB(color));
     }
 
+    /// <summary>
+    /// Serializes FaceObject.
+    /// </summary>
+    /// <returns></returns>
     public string Serialize()
     {
         Debug.Log("FaceObjectController:Serialize()");
@@ -535,6 +622,11 @@ public class FaceObjectController : MonoBehaviour
         return content.ToString();
     }
 
+    /// <summary>
+    /// Serializes sub-objects.
+    /// </summary>
+    /// <param name="node">Root transform object to serialize.</param>
+    /// <returns></returns>
     private string SerializeSubObjects(Transform node)
     {
         string returnVal = "";
@@ -554,6 +646,11 @@ public class FaceObjectController : MonoBehaviour
         return returnVal;
     }
 
+    /// <summary>
+    /// Prepares serialization entry of given transform object in XML format.
+    /// </summary>
+    /// <param name="transform">Transform object to serialize.</param>
+    /// <returns></returns>
     private string PrepareSerializeLine(Transform transform)
     {
         string returnStr = "<Object ";
@@ -577,10 +674,15 @@ public class FaceObjectController : MonoBehaviour
         return returnStr;
     }
 
+    /// <summary>
+    /// Deserializes given data and loads it to FaceObject.
+    /// </summary>
+    /// <param name="data">Serialized XML data.</param>
     public void Unserialize(string data)
     {
         Debug.Log("FaceObjectController:Unserialize()\n" + data);
 
+        // Initialization
         AssetType assetType = AssetType.None;
         string objectName = "";
         string assetName = "";

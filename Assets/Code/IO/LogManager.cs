@@ -4,10 +4,16 @@ using UnityEngine;
 using System;
 using System.Text;
 
+/// <summary>
+/// A class for logging user's actions during runtime. Those actions are used for analyzing user's behaviors.
+/// </summary>
 public class LogManager : MonoBehaviour
 {
     protected StringBuilder m_actionLogs;
 
+    /// <summary>
+    /// Constructor.
+    /// </summary>
     public LogManager()
     {
         //  m_actions = new List<CLogAction>();
@@ -15,6 +21,11 @@ public class LogManager : MonoBehaviour
         m_actionLogs.Append("<Actions>\n");
     }
 
+    /// <summary>
+    /// Logs an action.
+    /// </summary>
+    /// <param name="action">Action name.</param>
+    /// <param name="value">Action value.</param>
     public void LogAction(string action, string value)
     {
         //m_actions.Add(new CLogAction(action, value));
@@ -24,6 +35,10 @@ public class LogManager : MonoBehaviour
         m_actionLogs.Append(rowdata);
     }
 
+    /// <summary>
+    /// Saves user's all of recorded logs to server.
+    /// </summary>
+    /// <returns></returns>
     public string DumpLogs()
     {
         Debug.Log("LogManager:DumpLogs(): Dumping logs to server.");
@@ -41,6 +56,12 @@ public class LogManager : MonoBehaviour
         return data;
     }
 
+    /// <summary>
+    /// Creates a PHP request to server for saving serialized data into a file, which will be stored on server side.
+    /// This function called by DumpLogs()
+    /// </summary>
+    /// <param name="data">Serialized data.</param>
+    /// <returns></returns>
     IEnumerator PHPRequest(string data)
     {
         bool successfull = true;

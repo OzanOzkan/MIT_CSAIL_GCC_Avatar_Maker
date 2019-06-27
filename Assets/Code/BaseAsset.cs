@@ -4,12 +4,21 @@ using UnityEngine;
 using System.IO;
 using UnityEngine.UI;
 
+/// <summary>
+/// An empty class for maintaining Unity's reflection.
+/// In Unity environment, every .cs file needs at least one class inside, which should be the same with file name.
+/// </summary>
 public class BaseAsset : MonoBehaviour
 {
-    // This class is needed for Unity's reflection.
+    // No Implementation
 }
 
 #region Enumerations
+/// <summary>
+/// Enumeration for genders.
+/// Stored in the Asset object. Indicates which gender it belongs to.
+/// An asset can have only one gender.
+/// </summary>
 public enum AssetGender
 {
     Male,
@@ -17,6 +26,11 @@ public enum AssetGender
     NoGender
 }
 
+/// <summary>
+/// Enumeration for asset types.
+/// Stored in the Asset object. Indicates which type of asset it is.
+/// An asset can only have one type.
+/// </summary>
 public enum AssetType
 {
     HeadShape,
@@ -38,6 +52,11 @@ public enum AssetType
     None
 }
 
+/// <summary>
+/// Enumeration for asset modifications. 
+/// Stored in the asset object. System allows to modify an asset according to it's modification flags.
+/// An asset can have one, more than one and no asset modification flag.
+/// </summary>
 [System.Flags]
 public enum AssetModifyFlag : int
 {
@@ -50,6 +69,11 @@ public enum AssetModifyFlag : int
     Rotate              = 64
 }
 
+/// <summary>
+/// Enumeration for asset location.
+/// Stored in the asset object. If one asset consists of multiple parts, this enum indicates which part it is.
+/// An asset part can only have one of sprite part.
+/// </summary>
 public enum SpritePart
 {
     Default,
@@ -60,6 +84,10 @@ public enum SpritePart
     Reserved
 }
 
+/// <summary>
+/// Enumeration for realism level.
+/// Stored in the asset object. Indicates asset's realism level.
+/// </summary>
 public enum RealismLevel
 {
     A,
@@ -68,9 +96,15 @@ public enum RealismLevel
 }
 #endregion
 
+/// <summary>
+/// Base class of an asset.
+/// Contains shared members and functions among all assets.
+/// All assets are objects and every asset object loads it's sprites from the disk at the object creation time. 
+/// For finding assets, placing them, manipulating them etc. system uses loaded asset objects and there is no continuous read/write operation on asset files located on disk.
+/// </summary>
 public class CBaseAsset
 {
-    #region Member Values
+    #region Member Variables
     protected AssetGender m_assetGender;
     protected AssetType m_assetType;
     protected AssetModifyFlag m_modifyFlags;
@@ -90,13 +124,21 @@ public class CBaseAsset
     }
 
     #region Shared Methods
+    /// <summary>
+    /// Loads sprite from given asset path to asset object.
+    /// </summary>
+    /// <param name="assetPath">Path of the sprite file.</param>
+    /// <param name="isOverride">
+    /// True: Child asset object will use its own LoadSpriteOverride method. 
+    /// False: This method will be used for loading sprites.
+    /// </param>
     protected void LoadSprite(string assetPath, bool isOverride)
     {
         m_sprites = new Dictionary<SpritePart, List<Sprite>>();
 
         if (!isOverride)
         {
-            List<Sprite> spriteListToLoad = new List<Sprite>(); // Dummy init.
+            List<Sprite> spriteListToLoad = new List<Sprite>(); // Dummy initialization.
 
             // Realism?
             if (Resources.Load<Sprite>(assetPath + "_A"))
@@ -124,18 +166,66 @@ public class CBaseAsset
         }
     }
 
+    /// <summary>
+    /// Loads sprite from given asset path. Implemented by child asset class.
+    /// </summary>
+    /// <param name="assetPath">Path of the sprite file.</param>
     protected virtual void LoadSpriteOverride(string assetPath) { }
 
+    /// <summary>
+    /// Returns asset type.
+    /// </summary>
+    /// <returns>
+    /// Asset type.
+    /// </returns>
     public AssetType GetAssetType() { return m_assetType; }
+
+    /// <summary>
+    /// Returns asset gender.
+    /// </summary>
+    /// <returns>
+    /// Gender of this asset.
+    /// </returns>
     public AssetGender GetGender() { return m_assetGender; }
+
+    /// <summary>
+    /// Returns modify flags of an asset.
+    /// </summary>
+    /// <returns>
+    /// Returns modify flags of this asset.
+    /// </returns>
     public AssetModifyFlag GetModifyFlags() { return m_modifyFlags; }
+
+    /// <summary>
+    /// Returns parts of this asset.
+    /// </summary>
+    /// <returns>
+    /// Dictionary which categorized by sprite parts and list of sprites.
+    /// </returns>
     public Dictionary<SpritePart, List<Sprite>> GetSprites() { return m_sprites; }
+
+    /// <summary>
+    /// Returns original sprite path of this asset.
+    /// </summary>
+    /// <param name="rawAssetPath"></param>
+    /// <returns>Original sprite path of this asset as a string.</returns>
     protected string GetResourcePath(string rawAssetPath) { return rawAssetPath.Replace(".png", ""); }
     #endregion
 }
 
+/// <summary>
+/// Asset factory for decoupling creation process of child asset objects and their types from entire codebase.
+/// Responsible for creating respective asset objects.
+/// </summary>
 public class CBaseAssetFactory
 {
+    /// <summary>
+    /// Creates an asset object with given parameters.
+    /// </summary>
+    /// <param name="type">Type of the asset.</param>
+    /// <param name="gender">Gender of the asset.</param>
+    /// <param name="assetPath">Path of asset sprites.</param>
+    /// <returns></returns>
     public CBaseAsset CreateAsset(AssetType type, AssetGender gender, string assetPath)
     {
         switch (type)
@@ -176,8 +266,16 @@ public class CBaseAssetFactory
     }
 }
 
+/// <summary>
+/// Object of the asset.
+/// </summary>
 public class CHeadShape : CBaseAsset
 {
+    /// <summary>
+    /// Initializes this subclass (asset) with given parameters.
+    /// </summary>
+    /// <param name="gender">Gender of this asset.</param>
+    /// <param name="assetPath">Path of sprites.</param>
     public CHeadShape(AssetGender gender, string assetPath)
         : base(gender, AssetType.HeadShape 
             , AssetModifyFlag.Resize | AssetModifyFlag.StretchHorizontal | AssetModifyFlag.StretchVertical
@@ -187,17 +285,26 @@ public class CHeadShape : CBaseAsset
 
 public class CHair : CBaseAsset
 {
+    /// <summary>
+    /// Initializes this subclass (asset) with given parameters.
+    /// </summary>
+    /// <param name="gender">Gender of this asset.</param>
+    /// <param name="assetPath">Path of sprites.</param>
     public CHair(AssetGender gender, string assetPath)
         : base(gender, AssetType.Hair
             , AssetModifyFlag.MoveVertical | AssetModifyFlag.Resize | AssetModifyFlag.StretchHorizontal | AssetModifyFlag.StretchVertical
             , assetPath, true)
     { }
 
+    /// <summary>
+    /// Loads sprite from given asset path. Implemented by child asset class.
+    /// </summary>
+    /// <param name="assetPath">Path of the sprite file.</param>
     protected override void LoadSpriteOverride(string assetPath)
     {
         Sprite spriteToLoad;
 
-        // Layered?
+        // Some sprites are layered for rendering order, so we need to handle this.
         if(spriteToLoad = Resources.Load<Sprite>(assetPath + "_A_L1"))
         {
             List<Sprite> backLayers = new List<Sprite>()
@@ -238,14 +345,26 @@ public class CHair : CBaseAsset
     }
 }
 
+/// <summary>
+/// Object of the asset.
+/// </summary>
 public class CEars : CBaseAsset
 {
+    /// <summary>
+    /// Initializes this subclass (asset) with given parameters.
+    /// </summary>
+    /// <param name="gender">Gender of this asset.</param>
+    /// <param name="assetPath">Path of sprites.</param>
     public CEars(AssetGender gender, string assetPath)
         : base(gender, AssetType.Ears
             , AssetModifyFlag.MoveVertical | AssetModifyFlag.Resize | AssetModifyFlag.StretchHorizontal | AssetModifyFlag.StretchVertical
             , assetPath, true)
     { }
 
+    /// <summary>
+    /// Loads sprite from given asset path. Implemented by child asset class.
+    /// </summary>
+    /// <param name="assetPath">Path of the sprite file.</param>
     protected override void LoadSpriteOverride(string assetPath)
     {
         List<Sprite> spriteListToLoad = new List<Sprite>()
@@ -265,14 +384,26 @@ public class CEars : CBaseAsset
     }
 }
 
+/// <summary>
+/// Object of the asset.
+/// </summary>
 public class CEyes : CBaseAsset
 {
+    /// <summary>
+    /// Initializes this subclass (asset) with given parameters.
+    /// </summary>
+    /// <param name="gender">Gender of this asset.</param>
+    /// <param name="assetPath">Path of sprites.</param>
     public CEyes(AssetGender gender, string assetPath)
         : base(gender, AssetType.Eyes
            , AssetModifyFlag.MoveVertical | AssetModifyFlag.Resize | AssetModifyFlag.ChangeDistance | AssetModifyFlag.Rotate
            , assetPath, true)
     { }
 
+    /// <summary>
+    /// Loads sprite from given asset path. Implemented by child asset class.
+    /// </summary>
+    /// <param name="assetPath">Path of the sprite file.</param>
     protected override void LoadSpriteOverride(string assetPath)
     {
         List<Sprite> skinColorizedLayers = new List<Sprite>()
@@ -318,8 +449,16 @@ public class CEyes : CBaseAsset
     }
 }
 
+/// <summary>
+/// Object of the asset.
+/// </summary>
 public class CEyebrows : CBaseAsset
 {
+    /// <summary>
+    /// Initializes this subclass (asset) with given parameters.
+    /// </summary>
+    /// <param name="gender">Gender of this asset.</param>
+    /// <param name="assetPath">Path of sprites.</param>
     public CEyebrows(AssetGender gender, string assetPath)
         : base(gender, AssetType.Eyebrows
             , AssetModifyFlag.MoveVertical | AssetModifyFlag.Resize | AssetModifyFlag.StretchHorizontal | AssetModifyFlag.StretchVertical
@@ -327,6 +466,10 @@ public class CEyebrows : CBaseAsset
             , assetPath, true)
     { }
 
+    /// <summary>
+    /// Loads sprite from given asset path. Implemented by child asset class.
+    /// </summary>
+    /// <param name="assetPath">Path of the sprite file.</param>
     protected override void LoadSpriteOverride(string assetPath)
     {
         List<Sprite> spriteListToLoad = new List<Sprite>()
@@ -346,30 +489,62 @@ public class CEyebrows : CBaseAsset
     }
 }
 
+/// <summary>
+/// Object of the asset.
+/// </summary>
 public class CGlasses : CBaseAsset
 {
+    /// <summary>
+    /// Initializes this subclass (asset) with given parameters.
+    /// </summary>
+    /// <param name="gender">Gender of this asset.</param>
+    /// <param name="assetPath">Path of sprites.</param>
     public CGlasses(AssetGender gender, string assetPath)
         : base(gender, AssetType.Glasses, AssetModifyFlag.MoveVertical, assetPath)
     { }
 }
 
+/// <summary>
+/// Object of the asset.
+/// </summary>
 public class CFaceTexture : CBaseAsset
 {
+    /// <summary>
+    /// Initializes this subclass (asset) with given parameters.
+    /// </summary>
+    /// <param name="gender">Gender of this asset.</param>
+    /// <param name="assetPath">Path of sprites.</param>
     public CFaceTexture(AssetGender gender, string assetPath)
         : base(gender, AssetType.FaceTexture, AssetModifyFlag.Resize | AssetModifyFlag.StretchHorizontal | AssetModifyFlag.StretchVertical, assetPath)
     { }
 }
 
+/// <summary>
+/// Object of the asset.
+/// </summary>
 public class CNose : CBaseAsset
 {
+    /// <summary>
+    /// Initializes this subclass (asset) with given parameters.
+    /// </summary>
+    /// <param name="gender">Gender of this asset.</param>
+    /// <param name="assetPath">Path of sprites.</param>
     public CNose(AssetGender gender, string assetPath)
         : base(gender, AssetType.Nose,
             AssetModifyFlag.MoveVertical | AssetModifyFlag.Resize | AssetModifyFlag.StretchHorizontal | AssetModifyFlag.StretchVertical, assetPath)
     { }
 }
 
+/// <summary>
+/// Object of the asset.
+/// </summary>
 public class CMoustache : CBaseAsset
 {
+    /// <summary>
+    /// Initializes this subclass (asset) with given parameters.
+    /// </summary>
+    /// <param name="gender">Gender of this asset.</param>
+    /// <param name="assetPath">Path of sprites.</param>
     public CMoustache(AssetGender gender, string assetPath)
         : base(gender, AssetType.Moustache
             , AssetModifyFlag.MoveVertical | AssetModifyFlag.Resize | AssetModifyFlag.StretchHorizontal | AssetModifyFlag.StretchVertical
@@ -377,8 +552,16 @@ public class CMoustache : CBaseAsset
     { }
 }
 
+/// <summary>
+/// Object of the asset.
+/// </summary>
 public class CBeard : CBaseAsset
 {
+    /// <summary>
+    /// Initializes this subclass (asset) with given parameters.
+    /// </summary>
+    /// <param name="gender">Gender of this asset.</param>
+    /// <param name="assetPath">Path of sprites.</param>
     public CBeard(AssetGender gender, string assetPath)
         : base(gender, AssetType.Beard
             , AssetModifyFlag.MoveVertical | AssetModifyFlag.Resize | AssetModifyFlag.StretchHorizontal | AssetModifyFlag.StretchVertical
@@ -386,14 +569,26 @@ public class CBeard : CBaseAsset
     { }
 }
 
+/// <summary>
+/// Object of the asset.
+/// </summary>
 public class CMouth : CBaseAsset
 {
+    /// <summary>
+    /// Initializes this subclass (asset) with given parameters.
+    /// </summary>
+    /// <param name="gender">Gender of this asset.</param>
+    /// <param name="assetPath">Path of sprites.</param>
     public CMouth(AssetGender gender, string assetPath)
         : base(gender ,AssetType.Mouth
             , AssetModifyFlag.MoveHorizontal | AssetModifyFlag.MoveVertical | AssetModifyFlag.Resize | AssetModifyFlag.StretchHorizontal | AssetModifyFlag.StretchVertical
             , assetPath, true)
     { }
 
+    /// <summary>
+    /// Loads sprite from given asset path. Implemented by child asset class.
+    /// </summary>
+    /// <param name="assetPath">Path of the sprite file.</param>
     protected override void LoadSpriteOverride(string assetPath)
     {
         List<Sprite> colorizedLayers = new List<Sprite>()
@@ -421,14 +616,26 @@ public class CMouth : CBaseAsset
     }
 }
 
+/// <summary>
+/// Object of the asset.
+/// </summary>
 public class CBody : CBaseAsset
 {
+    /// <summary>
+    /// Initializes this subclass (asset) with given parameters.
+    /// </summary>
+    /// <param name="gender">Gender of this asset.</param>
+    /// <param name="assetPath">Path of sprites.</param>
     public CBody(AssetGender gender, string assetPath)
         : base(gender, AssetType.Body
             , AssetModifyFlag.Resize | AssetModifyFlag.StretchHorizontal | AssetModifyFlag.StretchVertical
             , assetPath, true)
     { }
 
+    /// <summary>
+    /// Loads sprite from given asset path. Implemented by child asset class.
+    /// </summary>
+    /// <param name="assetPath">Path of the sprite file.</param>
     protected override void LoadSpriteOverride(string assetPath)
     {
         List<Sprite> nonColorizedLayers = new List<Sprite>()
@@ -449,17 +656,29 @@ public class CBody : CBaseAsset
     }
 }
 
+/// <summary>
+/// Object of the asset.
+/// </summary>
 public class CSpecialBody : CBaseAsset
 {
+    /// <summary>
+    /// Initializes this subclass (asset) with given parameters.
+    /// </summary>
+    /// <param name="gender">Gender of this asset.</param>
+    /// <param name="assetPath">Path of sprites.</param>
     public CSpecialBody(AssetGender gender, string assetPath)
     : base(gender, AssetType.SpecialBody
         , AssetModifyFlag.Resize | AssetModifyFlag.StretchHorizontal | AssetModifyFlag.StretchVertical
         , assetPath, true)
     { }
 
+    /// <summary>
+    /// Loads sprite from given asset path. Implemented by child asset class.
+    /// </summary>
+    /// <param name="assetPath">Path of the sprite file.</param>
     protected override void LoadSpriteOverride(string assetPath)
     {
-        // Layered?
+        // Some sprites are layered for rendering order, so we need to handle this.
         if (Resources.Load<Sprite>(assetPath + "_A_L1"))
         {
             List<Sprite> backLayers = new List<Sprite>()
@@ -503,14 +722,26 @@ public class CSpecialBody : CBaseAsset
     }
 }
 
+/// <summary>
+/// Object of the asset.
+/// </summary>
 public class CGhutra : CBaseAsset
 {
+    /// <summary>
+    /// Initializes this subclass (asset) with given parameters.
+    /// </summary>
+    /// <param name="gender">Gender of this asset.</param>
+    /// <param name="assetPath">Path of sprites.</param>
     public CGhutra(AssetGender gender, string assetPath)
     : base(gender, AssetType.Ghutra
         , AssetModifyFlag.MoveVertical | AssetModifyFlag.Resize | AssetModifyFlag.StretchHorizontal | AssetModifyFlag.StretchVertical
         , assetPath, true)
     { }
 
+    /// <summary>
+    /// Loads sprite from given asset path. Implemented by child asset class.
+    /// </summary>
+    /// <param name="assetPath">Path of the sprite file.</param>
     protected override void LoadSpriteOverride(string assetPath)
     {
         List<Sprite> backLayers = new List<Sprite>()
@@ -529,8 +760,16 @@ public class CGhutra : CBaseAsset
     }
 }
 
+/// <summary>
+/// Object of the asset.
+/// </summary>
 public class CBGTexture : CBaseAsset
 {
+    /// <summary>
+    /// Initializes this subclass (asset) with given parameters.
+    /// </summary>
+    /// <param name="gender">Gender of this asset.</param>
+    /// <param name="assetPath">Path of sprites.</param>
     public CBGTexture(AssetGender gender, string assetPath)
         : base(gender, AssetType.BackgroundTexture, 0, assetPath)
     { }

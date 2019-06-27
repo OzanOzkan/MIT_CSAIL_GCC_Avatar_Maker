@@ -3,21 +3,33 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// A controller class for Gender Button.
+/// </summary>
 public class UIGenderButtonController : MonoBehaviour {
 
     public AssetGender m_assetGender;
     private List<CBaseAsset> m_assetList;
     private AssetType m_lastSelectedAssetType = AssetType.None;
 
-	// Use this for initialization
+    /// <summary>
+    /// Called only once when application started.
+    /// </summary>
 	void Start ()
     {
+        // Not interactable by default state.
         gameObject.GetComponent<Button>().interactable = false;
+
+        // Register to button click events.
         gameObject.GetComponent<Button>().onClick.AddListener(() => OnButtonClick());
     }
-	
-	// Update is called once per frame
-	void Update () {
+
+    /// <summary>
+    /// Called once in every frame.
+    /// </summary>
+    void Update () {
+
+        // Check selected asset type in every frame and enable/disable button if selected gender has assets.
         if (m_lastSelectedAssetType != AvatarCreatorContext.selectedAssetType)
         {
             if (m_assetGender == AssetGender.NoGender)
@@ -34,9 +46,13 @@ public class UIGenderButtonController : MonoBehaviour {
         }
 	}
 
+    /// <summary>
+    /// Called in every button press.
+    /// </summary>
     public void OnButtonClick()
     {
-        // Todo: Maybe into the AvatarCreatorContext?
+        // Update asset list with selected gender's assets.
+        // Todo: Maybe move into the AvatarCreatorContext?
         Transform scrollView = GameObject.Find("Canvas").transform.Find("scrollview").transform.Find("Viewport").transform.Find("Content");
         scrollView.DestroyChildren();
 
@@ -46,7 +62,8 @@ public class UIGenderButtonController : MonoBehaviour {
             btn.AddComponent<UIScrollViewButtonController>().faceAsset = asset;
             btn.transform.SetParent(scrollView, false);
         }
-
+        
+        // Log user action.
         AvatarCreatorContext.logManager.LogAction("UIButtonClick", m_assetGender.ToString());
     }
 }

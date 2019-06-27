@@ -7,12 +7,18 @@ using UnityEngine.UI;
 using System.Xml;
 using System.Text;
 
+/// <summary>
+/// Enumeration of color palette.
+/// </summary>
 public enum ColorPalette
 {
     Default = 0,
     Skin
 }
 
+/// <summary>
+/// Loads assets and some utility functions. Singleton object, initialized once and destroyed at the end of runtime.
+/// </summary>
 public class AvatarCreatorContext : MonoBehaviour {
 
     public static AssetType selectedAssetType { get; set; }
@@ -34,7 +40,9 @@ public class AvatarCreatorContext : MonoBehaviour {
 
     public static UIAssetCategoryButtonController activeAssetCategoryButton;
 
-    // Use this for initialization
+    /// <summary>
+    /// Configures the application, loads assets etc. Called only once when application started.
+    /// </summary>
     void Start () {
         DontDestroyOnLoad(this.gameObject);
 
@@ -49,7 +57,7 @@ public class AvatarCreatorContext : MonoBehaviour {
         faceObject = GameObject.Find("FaceObject").GetComponent<FaceObjectController>();
         selectedAssetType = AssetType.None;
 
-        // Assets
+        // Load Assets
         InitAssets("FaceObject/fo_faceshape/", AssetType.HeadShape, AssetGender.NoGender);
         InitAssets("FaceObject/fo_hair/", AssetType.Hair, AssetGender.NoGender);
         InitAssets("FaceObject/fo_ears/", AssetType.Ears, AssetGender.NoGender);
@@ -80,9 +88,12 @@ public class AvatarCreatorContext : MonoBehaviour {
         faceObject.GenerateRandomAvatar();
     }
 
+    /// <summary>
+    /// Called once in every frame.
+    /// </summary>
     private void Update()
     {
-        // Manage color palette.
+        // Change color palette according to asset category.
         switch(selectedAssetType)
         {
             case AssetType.HeadShape:
@@ -102,9 +113,16 @@ public class AvatarCreatorContext : MonoBehaviour {
                 }
         }
 
+        // Change current background color to selected one.
         gameCamera.backgroundColor = bgColor;
     }
 
+    /// <summary>
+    ///  Loads assets from the disk with given path, type and gender.
+    /// </summary>
+    /// <param name="directoryPath"></param>
+    /// <param name="assetType"></param>
+    /// <param name="assetGender"></param>
     private void InitAssets(string directoryPath, AssetType assetType, AssetGender assetGender)
     {
         Debug.Log("AvatarCreatorContext:InitAssets: " + directoryPath + " " + assetType + " " + assetGender);
@@ -112,15 +130,17 @@ public class AvatarCreatorContext : MonoBehaviour {
         CBaseAssetFactory assetFactory = new CBaseAssetFactory();
         List<CBaseAsset> assets = new List<CBaseAsset>();
 
+        // Load all sprites inside given directory.
         Object[] sprites = Resources.LoadAll(directoryPath, typeof(Sprite));
         string lastLoadedSpriteName = "";
 
-        // Add empty asset in order to delete the already selected one.
+        // Add an empty asset to the list. Once it selected by the user, this empty asset will delete the current selected asset.
         if(assetType == AssetType.Hair || assetType == AssetType.Eyebrows || assetType == AssetType.Glasses
             || assetType == AssetType.FaceTexture || /*assetType == AssetType.Moustache ||*/ assetType == AssetType.Beard 
             || assetType == AssetType.BackgroundTexture || assetType == AssetType.Ghutra)
             assets.Add(assetFactory.CreateAsset(assetType, assetGender, ""));
 
+        // For every sprite, create the asset object and add it to the temporary list.
         foreach(Sprite sprite in sprites)
         {
             string currentSpriteName = sprite.name.Split('_')[0];
@@ -131,22 +151,38 @@ public class AvatarCreatorContext : MonoBehaviour {
             lastLoadedSpriteName = currentSpriteName;
         }
 
+        // Extend global asset list (currently loaded assets) with the temporary asset list.
         if(m_assets.ContainsKey(assetType))
             m_assets[assetType].AddRange(assets);
         else
             m_assets.Add(assetType, assets);
     }
 
+    /// <summary>
+    /// Returns all assets.
+    /// </summary>
+    /// <returns></returns>
     public static Dictionary<AssetType, List<CBaseAsset>> GetLoadedAssets()
     {
         return m_assets;
     }
 
+    /// <summary>
+    /// Returns all assets of the specified type.
+    /// </summary>
+    /// <param name="type"></param>
+    /// <returns></returns>
     public static List<CBaseAsset> GetLoadedAssetsByType(AssetType type)
     {
         return m_assets[type];
     }
 
+    /// <summary>
+    /// Returns all assets of the specified type and gender.
+    /// </summary>
+    /// <param name="type"></param>
+    /// <param name="gender"></param>
+    /// <returns></returns>
     public static List<CBaseAsset> GetLoadedAssetsByTypeAndGender(AssetType type, AssetGender gender)
     {
         List<CBaseAsset> returnList = new List<CBaseAsset>();
@@ -160,6 +196,11 @@ public class AvatarCreatorContext : MonoBehaviour {
         return returnList;
     }
 
+    /// <summary>
+    /// Returns an asset of the specified name.
+    /// </summary>
+    /// <param name="name"></param>
+    /// <returns></returns>
     public static CBaseAsset FindAssetByName(string name)
     {
         if (name == "")
@@ -180,6 +221,12 @@ public class AvatarCreatorContext : MonoBehaviour {
         return null;
     }
 
+    /// <summary>
+    /// Returns an asset of the specified type and name.
+    /// </summary>
+    /// <param name="type"></param>
+    /// <param name="name"></param>
+    /// <returns></returns>
     public static CBaseAsset FindAssetByName(AssetType type, string name)
     {
         if (name == "")
@@ -197,17 +244,27 @@ public class AvatarCreatorContext : MonoBehaviour {
         return null;
     }
 
+    /// <summary>
+    /// Updates asset category list.
+    /// </summary>
     public static void UpdateAssetCategoryList()
     {
         activeAssetCategoryButton.UpdateScrollList();
     }
 
+    /// <summary>
+    /// Saves current avatar to a file.
+    /// </summary>
     public static void SaveAvatarToFile()
     {
         string savedata = logManager.DumpLogs();
         fileTransferManager.DownloadSaveFile(savedata);
     }
 
+    /// <summary>
+    /// Serializes UI fields for saving it to a file.
+    /// </summary>
+    /// <returns></returns>
     public static string SerializeUIFields()
     {
         StringBuilder returnString = new StringBuilder();
@@ -221,6 +278,10 @@ public class AvatarCreatorContext : MonoBehaviour {
         return returnString.ToString();
     }
 
+    /// <summary>
+    /// Loads UI field data from a file.
+    /// </summary>
+    /// <param name="data"></param>
     public static void UnserializeUIFields(string data)
     {
         Debug.Log("AvatarCreatorContext.UnserializeUIFields()");
@@ -260,13 +321,19 @@ public class AvatarCreatorContext : MonoBehaviour {
         }
     }
 
-    // FileTransferManager calls this method.
+    /// <summary>
+    /// Loads avatar from a file. FileTransferManager calls this method.
+    /// </summary>
+    /// <param name="data"></param>
     public static void LoadAvatarFromFile(string data)
     {
         faceObject.Unserialize(data);
         UnserializeUIFields(data);
     }
 
+    /// <summary>
+    /// Configures color palette.
+    /// </summary>
     public static void FillColorPalette()
     {
         // 19 x 9
@@ -310,6 +377,11 @@ public class AvatarCreatorContext : MonoBehaviour {
         }
     }
 
+    /// <summary>
+    /// Returns list of colors of the specified color palette.
+    /// </summary>
+    /// <param name="palette"></param>
+    /// <returns></returns>
     public static List<Color> GetPaletteColors(ColorPalette palette)
     {
         List<Color> returnList = new List<Color>();
